@@ -1,0 +1,16 @@
+Sirius Global V5 changes
+
+1. My Shares portfolio is now stored in backend/data/sirius.json and survives refresh/login.
+2. Property yield is shown in the user cabinet and capped at 50% for display.
+3. White WAITING card has a cleaner animated shimmer/progress effect.
+4. Deposit "I have paid" is now a real server-side action.
+5. Admin deposit list shows whether the user pressed "I have paid" and the timestamp.
+6. Pressing "I have paid" NEVER credits the balance.
+7. Balance is credited only by Admin -> Approve.
+8. User stays logged in and the last secure page (including Cabinet) is restored after refresh.
+9. Portfolio purchase and income claim are server-backed, so balance changes persist.
+
+Run:
+  cd backend
+  npm install
+  node server.js

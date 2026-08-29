@@ -1,0 +1,36 @@
+/* ------------------------------------------------------------------
+   04-BUTTON SYSTEM
+   Reusable .t-btnflex variants used for CTAs, modal actions,
+   outline buttons, and destructive actions.
+------------------------------------------------------------------ */
+.t-btnflex {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 10px; border: none; cursor: pointer; text-decoration: none;
+  font-family: var(--t-headline-font); transition: all 0.3s ease;
+  letter-spacing: 0.03em; border-radius: var(--radius-sm);
+}
+/* Sizes */
+.t-btnflex_md { padding: 14px 32px; font-size: 0.9rem; }
+.t-btnflex_sm { padding: 10px 22px; font-size: 0.8rem; }
+/* Variants */
+.t-btnflex--primary {
+  background: linear-gradient(135deg, var(--sg-gold), var(--sg-gold-dark));
+  color: #0b0d17; font-weight: 700;
+}
+.t-btnflex--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(201,169,110,0.35);
+}
+.t-btnflex--primary:disabled {
+  opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none;
+}
+.t-btnflex--outline {
+  background: transparent; color: var(--sg-gold);
+  border: 1px solid var(--sg-gold);
+}
+.t-btnflex--outline:hover { background: var(--sg-gold); color: #0b0d17; }
+/* Danger accent */
+.t-btnflex--danger {
+  border-color: rgba(231,76,60,0.4) !important;
+  color: #e74c3c !important;
+}

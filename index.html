@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <title>Sirius Global — UAE Real Estate Investments</title>
+  <meta property="og:title" content="Sirius Global — UAE Real Estate Investments">
+  <meta property="og:type" content="website">
+  <link rel="preload" href="assets/js/app.js?v=20260823v" as="script">
+  <link rel="shortcut icon" href="images/sirious.png" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/sg-bundle.css?v=20260823m">
+</head>
+<body>
+
+  <!-- ==== Shared modal overlay (components/sg-overlay.html) ==== -->
+  <!-- Shared overlay for all modals -->
+  <div class="sg-overlay" id="sgOverlay"></div>
+
+  <!-- ==== Modal: property detail (components/modal-property-detail.html) ==== -->
+  <!-- Modal: Property Detail (wide) -->
+  <div class="sg-modal sg-modal--wide" id="sgPropModal" role="dialog" aria-modal="true" aria-labelledby="sgPropModalTitle">
+    <button class="sg-modal__close" type="button" data-close-modal="" aria-label="Close">×</button>
+    <div class="sg-modal__title" id="sgPropModalTitle">Property Details</div>
+    <div class="sg-prop__imgwrap">
+      <img class="sg-prop__img" id="sgPmImg" src="" alt="">
+      <div class="sg-prop__badge-row">
+        <span class="sg-prop__badge sg-prop__badge--type" id="sgPmType"></span>
+        <span class="sg-prop__badge sg-prop__badge--loc" id="sgPmLoc"></span>
+      </div>
+    </div>
+    <!-- Full market value of the entire property -->
+    <div class="sg-prop__value-row">
+      <span class="sg-prop__value-label">Full Property Value</span>
+      <span class="sg-prop__value-amount" id="sgPmTotalValue">$1,500,000</span>
+    </div>
+    <!-- KPI grid -->
+    <div class="sg-prop__kpis">
+      <div class="sg-prop__kpi">
+        <div class="sg-prop__kpi-val" id="sgPmPrice"></div>
+        <div class="sg-prop__kpi-label">Share Price</div>
+      </div>
+      <div class="sg-prop__kpi">
+        <div class="sg-prop__kpi-val green" id="sgPmYield"></div>
+        <div class="sg-prop__kpi-label">Annual Yield</div>
+      </div>
+      <div class="sg-prop__kpi">
+        <div class="sg-prop__kpi-val" id="sgPmOcc"></div>
+        <div class="sg-prop__kpi-label">Occupancy</div>
+      </div>
+    </div>
+    <p class="sg-prop__desc" id="sgPmDesc"></p>
+    <div class="sg-prop__specs" id="sgPmSpecs"></div>
+    <!-- Photo gallery (carousel) -->
+    <div class="sg-prop__tour-section">
+      <div class="sg-prop__tour-label">Gallery</div>
+      <div class="sg-prop__gallery-main" id="sgPmGalleryMain">
+        <img id="sgPmGalleryMainImg" src="" alt="">
+        <button type="button" class="sg-prop__gallery-arrow sg-prop__gallery-arrow--prev" id="sgPmGalleryPrev" aria-label="Previous photo">‹</button>
+        <button type="button" class="sg-prop__gallery-arrow sg-prop__gallery-arrow--next" id="sgPmGalleryNext" aria-label="Next photo">›</button>
+        <div class="sg-prop__gallery-counter" id="sgPmGalleryCounter">1 / 1</div>
+      </div>
+      <div class="sg-prop__gallery-dots" id="sgPmGalleryDots"></div>
+      <div class="sg-prop__gallery-thumbs" id="sgPmGalleryThumbs"></div>
+    </div>
+    <!-- Location map -->
+    <div class="sg-prop__tour-section">
+      <div class="sg-prop__tour-label">
+        Location
+        <a id="sgPmMapLink" href="#" target="_blank" rel="noopener" class="sg-prop__map-link">Open in Google Maps →</a>
+      </div>
+      <div class="sg-prop__map-wrap" id="sgPmMapWrap">
+        <iframe id="sgPmMapFrame" src="" title="Property location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
+    <!-- Property walkthrough (photo tour — no YouTube) -->
+    <div class="sg-prop__tour-section">
+      <div class="sg-prop__tour-label">Property walkthrough</div>
+      <div class="sg-prop__video-wrap" id="sgPmVideoWrap"></div>
+    </div>
+    <button class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%;margin-top:4px;" type="button" id="sgPmCartBtn">
+      <span class="t-btnflex__text">Add to Cart</span>
+    </button>
+  </div>
+
+  <!-- ==== Modal: deposit (components/modal-deposit.html) ==== -->
+  <!-- Modal: Deposit Request -->
+  <div class="sg-modal" id="sgDepositModal" role="dialog" aria-modal="true" aria-labelledby="sgDepositTitle">
+    <button class="sg-modal__close" type="button" data-close-modal="" aria-label="Close">×</button>
+    <div class="sg-modal__title" id="sgDepositTitle">Account Deposit</div>
+
+    <!-- USDT only -->
+    <div class="sg-pay-panel active" id="sgPayPanelUsdt">
+      <p class="sg-modal__text">
+        Send
+        <strong style="color:var(--sg-gold)">USDT (TRC20)</strong>
+        to the wallet below. Click "Submit Request" — your deposit will be queued for verification.
+      </p>
+      <label class="sg-modal__label">Platform deposit address</label>
+      <div class="sg-wallet-box">
+        <span class="sg-wallet-addr" id="sgWalletAddrDisplay">TQrz3nEZcbv8Q8Q2LJGRx9Q8uTP3cLaSYM</span>
+        <button class="sg-copy-btn" type="button" id="sgCopyWalletBtn">Copy</button>
+      </div>
+    </div>
+
+    <label class="sg-modal__label">Amount (USD)</label>
+    <input class="sg-modal__input" type="number" id="sgDepositAmount" min="240" placeholder="Min 240">
+    <div class="sg-modal__info" id="sgDepositHintBox">
+      Minimum deposit:
+      <strong>$240</strong>
+    </div>
+    <div class="sg-modal__pending" id="sgDepositPendingMsg">
+      <strong>Request submitted!</strong>
+      <br>
+      Your
+      <span id="sgDepositPendingAmt"></span>
+      deposit request (<span id="sgDepositPendingMethod"></span>) is pending verification.
+    </div>
+
+    <button class="t-btnflex t-btnflex_md t-btnflex--outline" style="width:100%;margin-top:10px;display:none;position:relative;z-index:5;" type="button" id="sgIHavePaidBtn">
+      <span class="t-btnflex__text">I have paid</span>
+    </button>
+    <button class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%;margin-top:14px;" type="button" id="sgDepositConfirmBtn">
+      <span class="t-btnflex__text">Submit Deposit Request</span>
+    </button>
+  </div>
+
+  <!-- ==== Modal: withdraw (components/modal-withdraw.html) ==== -->
+  <!-- Modal: Withdrawal Request -->
+  <div class="sg-modal" id="sgWithdrawModal" role="dialog" aria-modal="true" aria-labelledby="sgWithdrawTitle">
+    <button class="sg-modal__close" type="button" data-close-modal="" aria-label="Close">×</button>
+    <div class="sg-modal__title" id="sgWithdrawTitle">Withdrawal Request</div>
+    <p class="sg-modal__text">
+      Withdrawals are processed in
+      <strong style="color:var(--sg-gold)">USDT (TRC20)</strong>
+      . A fixed network fee of
+      <strong style="color:var(--sg-gold)">$8.50 USDT</strong>
+      is charged on every withdrawal.
+    </p>
+    <label class="sg-modal__label">Amount (USDT)</label>
+    <input class="sg-modal__input" type="number" id="sgWithdrawAmount" placeholder="Enter amount">
+    <div id="sgWithdrawBalHint" style="font-size:0.78rem;color:var(--sg-cream-dark);margin:-6px 0 12px;"></div>
+    <div id="sgWithdrawFeeHint" style="font-size:0.78rem;color:#f0c244;margin:-4px 0 12px;">Fee: $8.50 USDT · Total debited = amount + fee</div>
+    <label class="sg-modal__label">Your USDT (TRC20) wallet address</label>
+    <input class="sg-modal__input" type="text" id="sgWithdrawAddr" placeholder="Enter your TRC20 address">
+    <button class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%" type="button" id="sgWithdrawConfirmBtn">
+      <span class="t-btnflex__text">Submit withdrawal request</span>
+    </button>
+  </div>
+
+  <!-- ==== Site header / navigation (components/header.html) ==== -->
+  <header class="sg-header">
+    <a class="sg-header__logo" id="sgLogoBtn" aria-label="Sirius Global Home">
+      <div class="sg-header__logo-icon">S</div>
+      <div class="sg-header__logo-text">
+        Sirius
+        <span>Global</span>
+      </div>
+    </a>
+    <nav class="sg-header__nav" id="sgNav" aria-label="Main navigation">
+      <a data-nav="sgPageMain">Home</a>
+      <a href="#sgPlansSection" id="sgNavPlans">Plans</a>
+      <a data-nav="sgPageCabinet">Account</a>
+    </nav>
+    <div class="sg-header__actions">
+      <button class="sg-header__cart-btn" type="button" data-nav="sgPageCabinet" aria-label="Open cart">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span>Cart</span>
+        <span class="sg-header__cart-badge" id="sgCartBadge" aria-hidden="true">0</span>
+      </button>
+      <button class="sg-header__burger" id="sgBurger" aria-label="Toggle menu" type="button" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==== Page: login / register (pages/page-auth.html) ==== -->
+  <div class="sg-page active" id="sgPageAuth">
+    <div class="sg-auth">
+      <div class="sg-auth__card">
+        <!-- Login form -->
+        <div id="authLogin">
+          <h2 class="sg-auth__title">Welcome Back</h2>
+          <p class="sg-auth__subtitle">Sign in to your account</p>
+          <form id="sgLoginForm" class="sg-form" novalidate="">
+            <div class="vb-input-group">
+              <label for="loginEmail">Email address</label>
+              <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+              <div class="t-input-error" id="loginEmailErr">Please enter a valid email</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="loginInvite">Access code (required)</label>
+              <input type="text" id="loginInvite" placeholder="ABC1" autocomplete="off" spellcheck="false" required>
+              <div class="t-input-error" id="loginInviteErr">Enter the one-time code linked to this account</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="loginPass">Password</label>
+              <div class="sg-pass-wrap"><input type="password" id="loginPass" placeholder="Min 6 characters" autocomplete="current-password">
+              <button type="button" class="sg-pass-eye" data-eye-for="loginPass" aria-label="Show password">👁</button>
+            </div>
+              <div class="t-input-error" id="loginPassErr">Minimum 6 characters required</div>
+            </div>
+            <button type="submit" class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%">
+              <span class="t-btnflex__text">Sign In</span>
+            </button>
+          </form>
+          <div class="sg-auth__forgot" style="margin-top:10px;text-align:center;">
+            <a href="#forgot" id="sgForgotLink" role="button" style="font-size:.78rem;color:var(--sg-cream-dark);text-decoration:underline;">Forgot password / email?</a>
+          </div>
+          <div class="sg-auth__link">
+            No account?
+            <a href="#register" id="sgGoRegister" role="button">Register</a>
+          </div>
+        </div>
+        <div id="authForgot" style="display:none;">
+          <h2 class="sg-auth__title">Account recovery</h2>
+          <p class="sg-auth__subtitle">Enter your unique access code</p>
+          <form id="sgForgotForm" class="sg-form" novalidate="">
+            <div class="vb-input-group">
+              <label for="forgotCode">Access code</label>
+              <input type="text" id="forgotCode" placeholder="ABC1" autocomplete="off" spellcheck="false">
+              <div class="t-input-error" id="forgotCodeErr">Enter a valid access code</div>
+            </div>
+            <button type="submit" class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%">
+              <span class="t-btnflex__text">Find account</span>
+            </button>
+          </form>
+          <div id="forgotResult" style="display:none;margin-top:16px;">
+            <p style="font-size:.85rem;color:var(--sg-cream-dark);margin:0 0 8px;">Email for this code:</p>
+            <p id="forgotEmailShow" style="color:var(--sg-gold);font-weight:600;margin:0 0 14px;"></p>
+            <div class="vb-input-group">
+              <label for="forgotNewPass">New password</label>
+              <div class="sg-pass-wrap"><input type="password" id="forgotNewPass" placeholder="Min 8 characters">
+              <button type="button" class="sg-pass-eye" data-eye-for="forgotNewPass" aria-label="Show password">👁</button>
+            </div>
+            </div>
+            <button type="button" id="forgotResetBtn" class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%">
+              <span class="t-btnflex__text">Reset password</span>
+            </button>
+          </div>
+          <div class="sg-auth__link">
+            <a href="#login" id="sgForgotBack" role="button">Back to Sign In</a>
+          </div>
+        </div>
+        <!-- Registration form -->
+        <div id="authRegister" style="display:none;">
+          <h2 class="sg-auth__title">Create Account</h2>
+          <p class="sg-auth__subtitle">Sign up in under 2 minutes</p>
+          <form id="sgRegForm" class="sg-form" novalidate="">
+            <div class="vb-input-group">
+              <label for="regName">Your name</label>
+              <input type="text" id="regName" placeholder="Your name" autocomplete="name">
+              <div class="t-input-error" id="regNameErr">Please enter your name (min. 2 characters)</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="regEmail">Email address</label>
+              <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+              <div class="t-input-error" id="regEmailErr">Please enter a valid email</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="regPhone">Phone</label>
+              <div class="sg-phone-row">
+                <select id="regPhoneCountry" class="sg-phone-country" aria-label="Country code"></select>
+                <input type="tel" id="regPhone" class="sg-phone-input" placeholder="50 123 4567" autocomplete="tel" inputmode="tel">
+              </div>
+              <div class="t-input-error" id="regPhoneErr">Please enter a valid phone number</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="regInvite">Registration code (required)</label>
+              <input type="text" id="regInvite" placeholder="ABC1" autocomplete="off" spellcheck="false" required>
+              <div class="t-input-error" id="regInviteErr">A valid one-time registration code is required</div>
+            </div>
+            <div class="vb-input-group">
+              <label for="regPass">Password</label>
+              <div class="sg-pass-wrap"><input type="password" id="regPass" placeholder="Min 8 characters" autocomplete="new-password">
+              <button type="button" class="sg-pass-eye" data-eye-for="regPass" aria-label="Show password">👁</button>
+            </div>
+              <div class="sg-pass-meter" id="regPassMeter" aria-hidden="true">
+                <div class="sg-pass-meter__track"><div class="sg-pass-meter__fill" id="regPassFill"></div></div>
+                <span class="sg-pass-meter__label" id="regPassLabel">Password strength</span>
+              </div>
+              <div class="t-input-error" id="regPassErr">Minimum 8 characters required</div>
+            </div>
+            <button type="submit" class="t-btnflex t-btnflex_md t-btnflex--primary" style="width:100%">
+              <span class="t-btnflex__text">Create Account</span>
+            </button>
+          </form>
+          <div class="sg-auth__link">
+            Already have an account?
+            <a href="#login" id="sgGoLogin" role="button">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: home (property listings) (pages/page-home.html) ==== -->
+  <div class="sg-page" id="sgPageMain">
+    <!-- Hero -->
+    <section class="sg-hero">
+      <div class="sg-hero__content">
+        <div class="sg-hero__badge">
+          <span class="sg-hero__badge-dot"></span>
+          UAE Real Estate Investments
+        </div>
+        <h1 class="sg-hero__title">
+          Welcome to
+          <em>Sirius Global</em>
+          Platform
+        </h1>
+        <p class="sg-hero__subtitle">Buy fractions of premium properties, yachts and vessels in Dubai and Abu Dhabi. Earn weekly income. First payouts within 7 days.</p>
+        <div class="sg-hero__actions">
+          <button class="t-btnflex t-btnflex_md t-btnflex--primary" type="button" id="sgScrollProps">
+            <span class="t-btnflex__text">Browse Properties</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    <!-- How it works -->
+    <section class="sg-section sg-section--dark2">
+      <div class="sg-section__header">
+        <div class="sg-label">How It Works</div>
+        <h2 class="sg-title">Three Steps to Your Investment</h2>
+        <p class="sg-desc">A simple and transparent process for buying fractions of premium UAE assets.</p>
+      </div>
+      <div class="sg-how">
+        <div class="sg-how__step">
+          <div class="sg-how__num">1</div>
+          <h3 class="sg-how__step-title">Register</h3>
+          <p class="sg-how__step-desc">Create your account in 2 minutes. Complete verification and fund your balance from $240.</p>
+        </div>
+        <div class="sg-how__step">
+          <div class="sg-how__num">2</div>
+          <h3 class="sg-how__step-title">Select Property</h3>
+          <p class="sg-how__step-desc">Browse 10 premium properties: apartments, villas, yachts, offices — click any to see full details and virtual tour.</p>
+        </div>
+        <div class="sg-how__step">
+          <div class="sg-how__num">3</div>
+          <h3 class="sg-how__step-title">Earn Returns</h3>
+          <p class="sg-how__step-desc">Weekly or monthly payouts to your account. First income within 7 days of purchase.</p>
+        </div>
+      </div>
+    </section>
+    <!-- License & Share Plans -->
+    <section class="sg-section sg-section--dark" id="sgPlansSection">
+      <div class="sg-section__header">
+        <div class="sg-label">Access &amp; Capacity</div>
+        <h2 class="sg-title">License &amp; Investment Plans</h2>
+        <p class="sg-desc">Choose a career license and an investment plan first — then buy property shares within your plan limit.</p>
+      </div>
+
+      <div class="sg-plans__status-bar">
+        <div class="sg-plans__status-block">
+          <div class="sg-plans__status-label">License</div>
+          <div id="sgLicenseStatus"><span class="sg-plans__status-off">No active license</span></div>
+        </div>
+        <div class="sg-plans__status-block">
+          <div class="sg-plans__status-label">Share Plan</div>
+          <div id="sgPlanStatus"><span class="sg-plans__status-off">No plan selected</span></div>
+        </div>
+      </div>
+
+      <h3 class="sg-plans__subtitle">Career License</h3>
+      <p class="sg-plans__intro">Temporary access. When the term ends, the full price is returned to your balance — you can purchase again for any period.</p>
+      <div class="sg-plans__grid" id="sgLicenseGrid"></div>
+
+      <h3 class="sg-plans__subtitle" style="margin-top:40px;">Share Plans</h3>
+      <p class="sg-plans__intro">Set how much you can invest in property shares. The plan stays forever. Downgrades are not allowed — only upgrades with a difference payment.</p>
+      <div class="sg-plans__grid sg-plans__grid--4" id="sgSharePlanGrid"></div>
+    </section>
+
+    <!-- Property catalog -->
+    <section class="sg-section sg-section--dark" id="sgPropsSection">
+      <div class="sg-section__header">
+        <div class="sg-label">Property Catalog</div>
+        <h2 class="sg-title">Exclusive UAE Real Estate</h2>
+        <p class="sg-desc">Click any card to view full description, share price, yield and an interior virtual tour.</p>
+      </div>
+      <div class="sg-props__track" id="sgPropsTrack"></div>
+      <div class="sg-props__controls">
+        <button class="sg-props__control" type="button" data-scroll-dir="prev" aria-label="Previous property">←</button>
+        <button class="sg-props__control" type="button" data-scroll-dir="next" aria-label="Next property">→</button>
+      </div>
+    </section>
+    <!-- Income / Payouts -->
+    <section class="sg-section sg-section--dark3">
+      <div class="sg-section__header">
+        <div class="sg-label">Returns</div>
+        <h2 class="sg-title">Flexible Payouts — Your Choice</h2>
+        <p class="sg-desc">Receive income weekly or monthly. First payout within 7 days of purchase.</p>
+      </div>
+      <div class="sg-income">
+        <div>
+          <h3 class="sg-income__title">Choose Your Rhythm</h3>
+          <p class="sg-income__body">Two income modes: weekly payouts for fast results, monthly for maximum compounding effect.</p>
+          <p class="sg-income__body">
+            Average portfolio yield:
+            <strong class="sg-income__accent">30–45% annually</strong>
+          </p>
+        </div>
+        <div class="sg-income__plan">
+          <div class="sg-income__card">
+            <div class="sg-income__card-label">Weekly</div>
+            <div class="sg-income__card-value">7 days</div>
+            <div class="sg-income__card-desc">First payout in 7 days</div>
+          </div>
+          <div class="sg-income__card">
+            <div class="sg-income__card-label">Monthly</div>
+            <div class="sg-income__card-value">30 days</div>
+            <div class="sg-income__card-desc">Interest compounding</div>
+          </div>
+          <div class="sg-income__card">
+            <div class="sg-income__card-label">USDT Payouts</div>
+            <div class="sg-income__card-value">$8.50 fee</div>
+            <div class="sg-income__card-desc">Fixed fee per USDT withdrawal</div>
+          </div>
+          <div class="sg-income__card">
+            <div class="sg-income__card-label">UAE Guarantees</div>
+            <div class="sg-income__card-value">100%</div>
+            <div class="sg-income__card-desc">Assets in UAE jurisdiction</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==== Page: user cabinet (balance, cart, history) (pages/page-cabinet.html) ==== -->
+  <div class="sg-page" id="sgPageCabinet">
+    <div class="sg-cabinet">
+      <div class="sg-cabinet__inner">
+        <div class="sg-cabinet__grid">
+          <!-- Sidebar: Profile -->
+          <aside class="sg-cabinet__profile">
+            <div class="sg-cabinet__avatar" id="sgAvatarDisplay" role="button" aria-label="Change avatar">😊</div>
+            <div class="sg-cabinet__name" id="sgCabinetName">User</div>
+            <div class="sg-cabinet__email" id="sgCabinetEmail">user@example.com</div>
+            <div style="padding:16px;border-top:1px solid rgba(201,169,110,0.1);margin-top:12px;border-radius:var(--radius-md);background:rgba(201,169,110,0.04);">
+              <div class="sg-cabinet__avatar-picker-title">Profile Icon</div>
+              <div class="sg-cabinet__avatar-grid" id="sgAvatarGrid"></div>
+            </div>
+            <div class="sg-cabinet__balance-card">
+              <div class="sg-cabinet__balance-label">Confirmed Balance</div>
+              <div class="sg-cabinet__balance-amount" id="sgCabinetBalance">$0.00</div>
+              <div class="sg-cabinet__balance-hint" id="sgBalanceHint">Verified &amp; available for investing</div>
+            </div>
+            <div class="sg-cabinet__actions">
+              <button class="t-btnflex t-btnflex_sm t-btnflex--primary" type="button" id="sgOpenDeposit">
+                <span class="t-btnflex__text">Deposit</span>
+              </button>
+              <button class="t-btnflex t-btnflex_sm t-btnflex--outline" type="button" id="sgOpenWithdraw">
+                <span class="t-btnflex__text">Withdraw</span>
+              </button>
+              <button class="t-btnflex t-btnflex_sm t-btnflex--outline t-btnflex--danger" type="button" id="sgLogoutBtn">
+                <span class="t-btnflex__text">Logout</span>
+              </button>
+            </div>
+          </aside>
+          <!-- Main: Cart & History -->
+          <main class="sg-cabinet__main">
+            <div class="sg-cabinet__tabs" role="tablist">
+              <button class="sg-cabinet__tab active" type="button" data-tab="tabCart" role="tab" aria-selected="true">Cart</button>
+              <button class="sg-cabinet__tab" type="button" data-tab="tabPortfolio" role="tab" aria-selected="false">My Shares</button>
+              <button class="sg-cabinet__tab" type="button" data-tab="tabHistory" role="tab" aria-selected="false">History</button>
+            </div>
+            <!-- Tab: Cart -->
+            <div class="sg-cabinet__tab-content active" id="tabCart" role="tabpanel">
+              <div class="sg-cabinet__pending-list" id="sgPendingList">
+                <h4>⏳ Pending Deposit Requests</h4>
+                <div id="sgPendingItems"></div>
+              </div>
+              <div class="sg-cabinet__cart-empty" id="sgCartEmpty">
+                <p>Your cart is empty. Add properties from the catalog to start investing.</p>
+              </div>
+              <div id="sgCartList" style="display:none;"></div>
+              <div class="sg-cabinet__cart-summary" id="sgCartSummary" style="display:none;">
+                <div class="sg-cabinet__cart-total">
+                  <span>Cart total:</span>
+                  <span id="sgCartTotal">$0.00</span>
+                </div>
+                <div class="sg-cabinet__deposit-hint" id="sgDepHint"></div>
+                <button class="sg-cabinet__cart-checkout" type="button" id="sgCheckoutBtn">Proceed to Checkout</button>
+              </div>
+            </div>
+            <!-- Tab: My Shares (Portfolio) -->
+            <div class="sg-cabinet__tab-content" id="tabPortfolio" role="tabpanel">
+              <div id="sgPortfolioEmpty" class="sg-cabinet__portfolio-empty">
+                <p>You have no shares yet. Buy properties from the catalog to start earning daily income.</p>
+              </div>
+              <div id="sgPortfolioList" style="display:none;"></div>
+              <div id="sgPortfolioSummary" class="sg-cabinet__portfolio-summary" style="display:none;">
+                <div class="sg-cabinet__portfolio-total">
+                  <span>Total invested:</span>
+                  <span id="sgPortfolioInvested">$0.00</span>
+                </div>
+                <div class="sg-cabinet__portfolio-total">
+                  <span>Daily income (all shares):</span>
+                  <span id="sgPortfolioDaily">$0.00</span>
+                </div>
+                <p class="sg-cabinet__portfolio-note">Первый доход — через 7 дней после покупки. Далее — каждые 24 часа. Время по Москве (UTC+3).</p>
+              </div>
+            </div>
+            <!-- Tab: History -->
+            <div class="sg-cabinet__tab-content" id="tabHistory" role="tabpanel">
+              <div id="sgHistoryList">
+                <div style="padding:24px;text-align:center;color:var(--sg-cream-dark);">
+                  <p>Transaction history will appear after your first operation.</p>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: checkout (pages/page-checkout.html) ==== -->
+  <div class="sg-page" id="sgPageCheckout">
+    <div class="sg-checkout">
+      <div class="sg-checkout__inner">
+        <div class="sg-checkout__card">
+          <h2 class="sg-checkout__title">Checkout</h2>
+          <div id="sgCheckoutList"></div>
+          <div class="sg-checkout__total">
+            <span>Total:</span>
+            <span id="sgCheckoutTotal">$0.00</span>
+          </div>
+          <form id="sgCheckoutForm">
+            <div class="vb-input-group sg-form">
+              <label for="chkName">Your name</label>
+              <input type="text" id="chkName" placeholder="Your name" required="" autocomplete="name">
+            </div>
+            <div class="vb-input-group sg-form">
+              <label for="chkEmail">Receipt email</label>
+              <input type="email" id="chkEmail" placeholder="you@example.com" required="" autocomplete="email">
+            </div>
+            <div class="sg-checkout__actions">
+              <button type="button" class="t-btnflex t-btnflex_md t-btnflex--outline" data-nav="sgPageCabinet">
+                <span class="t-btnflex__text">← Back</span>
+              </button>
+              <button type="submit" id="sgConfirmPurchaseBtn" class="t-btnflex t-btnflex_md t-btnflex--primary">
+                <span class="t-btnflex__text">Confirm Purchase</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: privacy policy ==== -->
+  <div class="sg-page" id="sgPagePrivacy">
+    <div class="sg-legal">
+      <div class="sg-legal__inner">
+        <h1 class="sg-legal__title">Privacy Policy</h1>
+        <div class="sg-legal__subtitle">Sirius Global — last updated August 2026</div>
+
+        <div class="sg-legal__section">
+          <h3>1. Introduction</h3>
+          <p>This Privacy Policy explains how Sirius Global FZ-LLC (“Sirius Global”, “we”, “us”, or “the Platform”) collects, uses, stores, shares, and protects personal data when you visit our website, create an account, deposit funds, purchase property shares, claim income, or otherwise interact with our services. By using the Platform you acknowledge that you have read and understood this Policy.</p>
+          <p>We process personal data in accordance with applicable laws of the United Arab Emirates, including Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL), and, where relevant, international standards such as the GDPR principles of lawfulness, fairness, transparency, purpose limitation, data minimisation, accuracy, storage limitation, integrity, and confidentiality.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>2. Data Controller</h3>
+          <p>The data controller is Sirius Global FZ-LLC, registered in the Dubai Multi Commodities Centre (DMCC), United Arab Emirates. For privacy-related requests you may contact us through the support channels published on the Platform. We will respond within a reasonable period required by applicable law.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>3. Categories of Data We Collect</h3>
+          <ul>
+            <li><strong>Identity data:</strong> full name, date of birth (if provided for KYC), nationality, government ID or passport details when verification is required.</li>
+            <li><strong>Contact data:</strong> email address, phone number (including country code), mailing address if supplied.</li>
+            <li><strong>Account data:</strong> login credentials (stored as secure hashes), avatar preference, language settings, authentication events.</li>
+            <li><strong>Financial data:</strong> deposit and withdrawal requests, amounts, USDT wallet addresses, transaction history, portfolio holdings, license and share-plan purchases, pending balances.</li>
+            <li><strong>Technical data:</strong> IP address, browser type and version, device identifiers, operating system, referral URLs, approximate geolocation derived from IP, cookies and similar technologies.</li>
+            <li><strong>Usage data:</strong> pages viewed, property interest, cart activity, claim timestamps, support interactions.</li>
+            <li><strong>Compliance data:</strong> KYC/AML documents, source-of-funds declarations, sanctions screening results, risk scores produced by our compliance processes.</li>
+          </ul>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>4. How We Collect Data</h3>
+          <p>We collect data directly from you when you register, update your profile, submit deposits or withdrawals, or contact support. We also collect data automatically through cookies, server logs, and analytics tools. In limited cases we may receive data from payment networks, blockchain explorers (for on-chain USDT confirmations), identity verification providers, and regulatory or law-enforcement bodies where legally required.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>5. Purposes and Legal Bases</h3>
+          <ul>
+            <li><strong>Providing the service</strong> — creating accounts, processing investments, calculating income, managing licenses and share plans (performance of a contract).</li>
+            <li><strong>Payments and treasury</strong> — matching deposits, executing withdrawals, applying fees (performance of a contract / legitimate interests).</li>
+            <li><strong>Security and fraud prevention</strong> — monitoring unusual activity, protecting accounts (legitimate interests / legal obligation).</li>
+            <li><strong>KYC/AML and regulatory compliance</strong> — identity checks, record-keeping, reporting (legal obligation).</li>
+            <li><strong>Communications</strong> — service notices, transactional emails, optional marketing where you opt in (consent / legitimate interests).</li>
+            <li><strong>Product improvement</strong> — aggregated analytics and service optimisation (legitimate interests).</li>
+          </ul>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>6. Sharing and Transfers</h3>
+          <p>We do not sell personal data. We may share data with: (a) infrastructure and cloud providers under written contracts; (b) KYC/AML and payment partners; (c) professional advisers (legal, audit); (d) authorities when required by law or court order; (e) a successor entity in a merger or restructuring, subject to equivalent protections. Cross-border transfers are protected by contractual safeguards and, where applicable, adequacy assessments.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>7. Retention</h3>
+          <p>We retain account and transaction records for as long as your account remains active and thereafter for the period required by UAE commercial, tax, and AML laws (typically up to several years after account closure). KYC documents are retained according to regulatory minimums. Technical logs are rotated on shorter cycles unless needed for security investigations.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>8. Security Measures</h3>
+          <p>We implement TLS encryption in transit, access controls, least-privilege administration, segmented environments for production data, monitoring for anomalous access, and staff confidentiality obligations. No method of transmission or storage is fully risk-free; you are responsible for keeping your password confidential and enabling any additional security features we offer.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>9. Your Rights</h3>
+          <p>Subject to applicable law, you may request access, correction, deletion, restriction, or portability of your personal data, and object to certain processing. You may withdraw marketing consent at any time. Some rights are limited where we must retain data for legal or contractual reasons. To exercise rights, contact support with sufficient information to verify your identity.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>10. Cookies</h3>
+          <p>We use essential cookies for session security and authentication, and optional analytics cookies to understand usage. You can control cookies through browser settings; disabling essential cookies may impair Platform functionality.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>11. Children</h3>
+          <p>The Platform is not directed at individuals under 18. We do not knowingly collect personal data from minors. If we learn that we have done so, we will delete such data promptly.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>12. Changes</h3>
+          <p>We may update this Policy from time to time. Material changes will be indicated by updating the “last updated” date and, where appropriate, by notice in the Platform. Continued use after changes constitutes acceptance of the revised Policy.</p>
+        </div>
+
+        <div class="sg-legal__back">
+          <a data-nav="sgPageMain">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: terms of use ==== -->
+  <div class="sg-page" id="sgPageTerms">
+    <div class="sg-legal">
+      <div class="sg-legal__inner">
+        <h1 class="sg-legal__title">Terms of Use</h1>
+        <div class="sg-legal__subtitle">Sirius Global — binding user agreement</div>
+
+        <div class="sg-legal__section">
+          <h3>1. Acceptance</h3>
+          <p>These Terms of Use (“Terms”) form a binding agreement between you (“User”, “Investor”) and Sirius Global FZ-LLC. By registering an account, funding a balance, purchasing shares, licenses, or plans, or otherwise using the Platform, you agree to these Terms and to our Privacy Policy. If you do not agree, do not use the Platform.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>2. Eligibility</h3>
+          <p>You must be at least 18 years old and have full legal capacity under the laws of your jurisdiction. You represent that you are not prohibited from using investment or virtual-asset services under applicable sanctions or local law. We may refuse, suspend, or terminate access if eligibility cannot be verified.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>3. Nature of the Service</h3>
+          <p>Sirius Global operates an online platform that enables Users to acquire fractional economic interests (“shares”) in curated UAE real-estate and related assets, hold career licenses and investment capacity plans, view projected income, and request deposits and withdrawals in USDT (TRC20). Ownership structures may involve special-purpose vehicles (SPVs) or contractual participation interests as described in product materials. The Platform is a technology and distribution layer; it is not a bank, and balances are not deposit insurance products.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>4. Account Registration</h3>
+          <p>You must provide accurate registration data and keep it updated. You are responsible for all activity under your credentials. Notify us immediately of unauthorised access. We may require identity verification (KYC) before increasing limits, releasing withdrawals, or unlocking certain products.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>5. Deposits</h3>
+          <ul>
+            <li>Minimum deposit: <strong>$240 USDT</strong> (or the amount shown in the deposit interface).</li>
+            <li>Supported funding method on the front end: USDT on the TRON network (TRC20) to the published platform address.</li>
+            <li>Deposit requests remain <em>pending</em> until confirmed on-chain and approved by our operations or automated matching. Confirmed balance increases only after verification.</li>
+            <li>Sending unsupported assets or using the wrong network may result in irreversible loss. Always verify the address and network before transfer.</li>
+          </ul>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>6. Share Plans and Licenses</h3>
+          <p><strong>Share Plans</strong> define the maximum amount you may allocate to property shares. Plans are permanent once purchased and may only be upgraded by paying the price difference; downgrades are not available. <strong>Career Licenses</strong> are time-limited access products. When a license term ends, the purchase price is credited back to your balance according to the product rules then in force, after which you may purchase a new term.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>7. Purchasing Property Shares</h3>
+          <p>You may purchase shares only within your active Share Plan limit and the remaining capacity of each property. Per-transaction limits (including a maximum of ten shares per purchase where applicable) are enforced in the interface. Checkout deducts confirmed balance. After purchase, income eligibility follows the schedule shown in your account (including any initial lock-up and subsequent claim intervals).</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>8. Income and Projections</h3>
+          <p>Displayed yields and day/week/year figures are illustrative projections based on stated annual rates. Actual distributions depend on asset performance, occupancy, expenses, and operational factors. Income claims are subject to timers and Platform rules. Nothing on the Platform constitutes a promise of fixed returns.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>9. Withdrawals</h3>
+          <ul>
+            <li>Withdrawals are paid in USDT (TRC20) to an address you provide.</li>
+            <li>A fixed fee of <strong>$8.50 USDT</strong> is charged on each successful withdrawal request in addition to the amount sent.</li>
+            <li>You must have sufficient confirmed balance to cover amount + fee.</li>
+            <li>Processing times depend on compliance checks and network conditions; typical targets are within 24 hours after approval.</li>
+            <li>We may delay or refuse withdrawals that fail AML checks, involve incorrect addresses, or exceed risk limits.</li>
+          </ul>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>10. Prohibited Conduct</h3>
+          <p>You may not: use the Platform for money laundering or sanctions evasion; attempt to bypass plan limits or claim timers; interfere with Platform security; scrape or reverse-engineer systems without authorisation; misrepresent identity; or use the service for any unlawful purpose.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>11. Risk Disclosure</h3>
+          <p>Investment in real estate and digital settlement assets involves risk, including market risk, liquidity risk, operational risk, regulatory change, and technology risk (including blockchain network failures). You may lose part or all of amounts allocated. Past or projected performance is not indicative of future results. You should seek independent advice if needed.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>12. Limitation of Liability</h3>
+          <p>To the maximum extent permitted by law, Sirius Global is not liable for indirect, incidental, special, or consequential damages, or for losses arising from user error (including wrong network or address), third-party service failures, or force majeure. Our aggregate liability related to the Platform is limited to fees you paid to us in the three months preceding the claim, except where liability cannot be limited by law.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>13. Suspension and Termination</h3>
+          <p>We may suspend or terminate accounts for breach of these Terms, legal requirements, or risk concerns. You may request account closure through support; residual balances and open positions will be handled according to operational and legal constraints.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>14. Governing Law</h3>
+          <p>These Terms are governed by the laws of the United Arab Emirates. Disputes shall be subject to the competent courts of Dubai, without prejudice to mandatory consumer protections that may apply in your jurisdiction.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>15. Changes to Terms</h3>
+          <p>We may amend these Terms by posting an updated version on the Platform. Continued use after the effective date constitutes acceptance. Material changes affecting existing investments will be communicated where reasonably practicable.</p>
+        </div>
+
+        <div class="sg-legal__back">
+          <a data-nav="sgPageMain">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: licenses ==== -->
+  <div class="sg-page" id="sgPageLicenses">
+    <div class="sg-legal">
+      <div class="sg-legal__inner">
+        <h1 class="sg-legal__title">Licenses &amp; Regulation</h1>
+        <div class="sg-legal__subtitle">Corporate and regulatory framework</div>
+
+        <div class="sg-legal__section">
+          <h3>1. Company Registration</h3>
+          <p>Sirius Global FZ-LLC is established as a free-zone limited liability company in the Dubai Multi Commodities Centre (DMCC), United Arab Emirates. DMCC is a major UAE free zone for commodities, trading, and related services, operating under the oversight of Dubai authorities with published company registration procedures, beneficial ownership disclosure requirements, and ongoing compliance obligations for licence holders.</p>
+          <p>Our commercial activities on the Platform relate to technology-enabled distribution of fractional participation in UAE real-estate assets, account funding in virtual assets (USDT), and related investor tooling. Specific licence categories and certificate numbers are maintained in our corporate records and may be presented to counterparties and regulators upon legitimate request.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>2. Investment and Virtual Asset Context</h3>
+          <p>Depending on product design, activities may intersect with investment management, crowdfunding-style participation, or virtual-asset dealing. In the UAE, relevant frameworks can include free-zone commercial licences, and, where virtual assets are involved, rules administered by bodies such as the Dubai Virtual Assets Regulatory Authority (VARA) for onshore Dubai virtual-asset activities, and other free-zone or federal regimes as applicable.</p>
+          <p>Sirius Global structures operations to align with the licence scope under which it operates. Users acknowledge that regulatory classifications can evolve and that the Platform may adjust features to remain compliant.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>3. Asset Holding Structures</h3>
+          <p>Underlying properties are typically held through special-purpose vehicles (SPVs), joint ownership arrangements, or contractual participation agreements governed by UAE law. Fractional “shares” on the Platform represent economic participation as described in each product’s documentation, not necessarily direct freehold title in the user’s personal name unless expressly stated.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>4. AML / CFT Programme</h3>
+          <p>We maintain anti-money-laundering and counter-terrorist-financing controls consistent with UAE Federal Decree-Law on Combating Money Laundering and related Cabinet decisions. Controls may include customer due diligence, ongoing monitoring, screening against sanctions lists, and suspicious activity escalation. We may request additional documents at any time and freeze or report activity where required by law.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>5. Payments and Blockchain Settlement</h3>
+          <p>Client funding and withdrawals on the current interface use USDT on the TRON (TRC20) network. Blockchain transactions are public and irreversible once confirmed. Platform deposit addresses and withdrawal processing are subject to internal treasury controls. A fixed withdrawal fee applies as stated in the Terms of Use and the withdrawal interface.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>6. Career License Product</h3>
+          <p>The “Career License” sold on the Platform is a commercial access product with a defined term (1, 3, or 6 months). It is distinct from governmental professional licences. Upon expiry, the Platform rules provide for return of the license purchase amount to the user’s balance, enabling repurchase for a new term.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>7. Transparency and Updates</h3>
+          <p>We may publish additional corporate certificates, auditor letters, or regulatory notices in this section as they become available. Placeholder licence numbers in marketing materials must be replaced with verified official identifiers before public regulatory claims are relied upon. Users should not treat aspirational or template licence text as a substitute for independent verification.</p>
+        </div>
+
+        <div class="sg-legal__section">
+          <h3>8. Contact for Compliance</h3>
+          <p>Institutional counterparties and regulators may request official documentation through the compliance channel listed in Platform support. Retail users with questions about licensing scope should contact support; we will provide information consistent with confidentiality and legal constraints.</p>
+        </div>
+
+        <div class="sg-legal__back">
+          <a data-nav="sgPageMain">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Page: FAQ ==== -->
+  <div class="sg-page" id="sgPageFaq">
+    <div class="sg-legal">
+      <div class="sg-legal__inner">
+        <h1 class="sg-legal__title">FAQ</h1>
+        <div class="sg-legal__subtitle">Frequently asked questions</div>
+        <div class="sg-faq">
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">What is Sirius Global?</div>
+            <div class="sg-faq__answer">Sirius Global is an online platform for fractional participation in UAE real-estate assets. After registration you can deposit USDT, purchase a Share Plan, optionally buy a Career License, invest in property shares, and claim income according to Platform rules.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">What is the minimum deposit?</div>
+            <div class="sg-faq__answer">The minimum deposit is <strong>$240 USDT</strong> (TRC20). Enter the amount in the Deposit modal, send USDT to the displayed platform address, and submit a deposit request for verification.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">How do deposits work?</div>
+            <div class="sg-faq__answer">Deposits are USDT on the TRON network only. After you submit a request, it appears as pending until our system or operations confirm the on-chain transfer. Your confirmed balance increases only after approval. Always double-check the wallet address and network before sending funds.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">How long does deposit verification take?</div>
+            <div class="sg-faq__answer">Most deposits are reviewed within 24 hours after network confirmation. You can track pending items under Pending Deposit Requests in your Account cart tab.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">What is a Share Plan?</div>
+            <div class="sg-faq__answer">A Share Plan sets the maximum total amount you can invest in property shares (for example Starter up to $5,000, up to Elite at $100,000). Plans are permanent. You can only upgrade by paying the difference; you cannot downgrade.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">What is a Career License?</div>
+            <div class="sg-faq__answer">A Career License is a timed access product (1, 3, or 6 months). When the term ends, the purchase price is returned to your balance and you may buy again for any available term.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">How do I buy property shares?</div>
+            <div class="sg-faq__answer">You need an active Share Plan and sufficient confirmed balance. On each property card, choose the number of shares (up to 10 per purchase), add to cart, and complete checkout. Share prices start from $170 on selected units and from $1,000 upward on others.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">When can I claim income?</div>
+            <div class="sg-faq__answer">After purchase there is an initial unlock period (7 days), then you may claim daily income every 24 hours based on Moscow time timers shown in My Shares. Claimed income is credited to your confirmed balance.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">How do withdrawals work?</div>
+            <div class="sg-faq__answer">Enter the USDT amount and your TRC20 address. A fixed fee of <strong>$8.50 USDT</strong> is added to every withdrawal. Your balance must cover amount + fee. After submission, the request is processed according to compliance and treasury procedures, typically within 24 hours of approval.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">Do I need an account to browse properties?</div>
+            <div class="sg-faq__answer">Yes. The catalog, plans, and cabinet require sign-in. Privacy Policy, Terms, Licenses, and this FAQ remain readable without an account.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">Is income guaranteed?</div>
+            <div class="sg-faq__answer">No. Figures shown are projections based on stated annual yields. Real outcomes depend on asset performance and Platform operations. Review the Terms of Use risk disclosure before investing.</div>
+          </div>
+
+          <div class="sg-faq__item">
+            <div class="sg-faq__question">How do I contact support?</div>
+            <div class="sg-faq__answer">Use the support channels published in your account area or on official Sirius Global communications. Include your registered email and relevant transaction IDs for faster handling of deposit or withdrawal questions.</div>
+          </div>
+
+        </div>
+        <div class="sg-legal__back" style="margin-top:40px;">
+          <a data-nav="sgPageMain">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== Site footer (components/footer.html) ==== -->
+  <footer class="sg-footer">
+    <div class="sg-footer__inner">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" data-nav="sgPageMain">
+          <div class="sg-header__logo-icon">S</div>
+          <div class="sg-header__logo-text">
+            Sirius
+            <span>Global</span>
+          </div>
+        </div>
+        <p class="sg-footer__brand-desc">Investment platform for buying fractions of premium real estate, yachts and vessels in the UAE.</p>
+      </div>
+      <div class="sg-footer__col">
+        <div class="sg-footer__col-title">Pages</div>
+        <a data-nav="sgPageMain">Home</a>
+        <a data-nav="sgPageCabinet">Account</a>
+      </div>
+      <div class="sg-footer__col">
+        <div class="sg-footer__col-title">Legal</div>
+        <a data-nav="sgPagePrivacy">Privacy Policy</a>
+        <a data-nav="sgPageTerms">Terms of Use</a>
+        <a data-nav="sgPageLicenses">Licenses</a>
+      </div>
+      <div class="sg-footer__col">
+        <div class="sg-footer__col-title">Support</div>
+        <a href="https://t.me/SiriusGlobalSupport" target="_blank" rel="noopener">Telegram Support</a>
+        <a data-nav="sgPageFaq">FAQ</a>
+        <a href="mailto:SiriousSupport@proton.me">SiriousSupport@proton.me</a>
+      </div>
+    </div>
+    <div class="sg-footer__payments">
+      <span class="sg-footer__payments-label">Accepted payment methods</span>
+      <div class="sg-footer__payment-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9 9.5h4.5a2 2 0 1 1 0 4H9m0-4v9m0-4.5h4"></path></svg>
+        USDT · TRC20
+      </div>
+      <!-- Space reserved for your own logo assets (security audit / network badges) — drop image files in images/ and swap these placeholders once you have them. -->
+    </div>
+    <div class="sg-footer__bottom">© 2025 Sirius Global. All rights reserved.</div>
+  </footer>
+
+  <script src="assets/js/geo.js?v=20260823"></script>
+  <script src="assets/js/app.js?v=20260823v"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+/* ------------------------------------------------------------------
+   01-RESET & BASE
+   Global box-model, font inheritance, CSS variables, body base styles.
+------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #0b0d17; color: #e8e4d9;
+  -webkit-font-smoothing: antialiased;
+}
+/* Prevent background scroll when any modal is open */
+body.sg-body-no-scroll {
+  overflow: hidden !important;
+  touch-action: none;
+  position: fixed;
+  width: 100%;
+}
+input, textarea, select { font: inherit; }
+
+/* ------------------------------------------------------------------
+   02-CSS VARIABLES
+   Design tokens: colors, fonts, spacing base.
+------------------------------------------------------------------ */
+:root {
+  --t-headline-font: Georgia, 'Times New Roman', serif;
+  --t-text-font:     Georgia, 'Times New Roman', serif;
+
+  --sg-gold:       #c9a96e;
+  --sg-gold-light: #e0c88a;
+  --sg-gold-dark:  #a8874a;
+  --sg-dark:       #0b0d17;
+  --sg-dark-2:     #111520;
+  --sg-dark-3:     #1a1f2e;
+  --sg-cream:      #e8e4d9;
+  --sg-cream-dark: #b0ab9e;
+
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+}

@@ -1,0 +1,275 @@
+/* ------------------------------------------------------------------
+   07-CABINET / ACCOUNT PAGE
+   Profile sidebar, balance card, avatar picker, cart & history tabs.
+------------------------------------------------------------------ */
+.sg-cabinet { min-height:100vh; padding:100px 40px 60px; background:var(--sg-dark); }
+.sg-cabinet__inner { max-width:1050px; margin:0 auto; }
+.sg-cabinet__grid { display:grid; grid-template-columns:1fr 2fr; gap:28px; }
+
+/* Sidebar profile */
+.sg-cabinet__profile { background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.08); border-radius:var(--radius-xl); padding:30px 24px; height:fit-content; text-align:center; }
+.sg-cabinet__avatar { width:90px; height:90px; border-radius:50%; background:rgba(201,169,110,0.1); border:3px solid var(--sg-gold); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:2.8rem; cursor:pointer; user-select:none; }
+.sg-cabinet__name { font-family:var(--t-headline-font); font-size:1.2rem; color:var(--sg-cream); margin-bottom:4px; }
+.sg-cabinet__email { font-size:0.82rem; color:var(--sg-cream-dark); margin-bottom:18px; }
+.sg-cabinet__avatar-picker-title { font-family:var(--t-headline-font); font-size:0.75rem; color:var(--sg-cream-dark); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px; }
+.sg-cabinet__avatar-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.sg-cabinet__avatar-opt { padding:8px; font-size:1.5rem; background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.12); border-radius:var(--radius-sm); cursor:pointer; transition:all 0.3s; text-align:center; }
+.sg-cabinet__avatar-opt:hover { background:rgba(201,169,110,0.15); border-color:rgba(201,169,110,0.3); }
+.sg-cabinet__avatar-opt.selected { background:rgba(201,169,110,0.2); border-color:var(--sg-gold); }
+
+/* Balance card */
+.sg-cabinet__balance-card { background:linear-gradient(135deg, rgba(201,169,110,0.12), rgba(201,169,110,0.04)); border:1px solid rgba(201,169,110,0.2); border-radius:var(--radius-md); padding:20px; margin:20px 0 18px; }
+.sg-cabinet__balance-label { font-size:0.75rem; color:var(--sg-cream-dark); letter-spacing:0.05em; text-transform:uppercase; font-family:var(--t-headline-font); }
+.sg-cabinet__balance-amount { font-family:var(--t-headline-font); font-size:2rem; color:var(--sg-gold); font-weight:600; margin:6px 0; }
+.sg-cabinet__balance-hint { font-size:0.8rem; color:var(--sg-cream-dark); }
+.sg-cabinet__actions { display:flex; gap:8px; flex-wrap:wrap; }
+.sg-cabinet__actions .t-btnflex { flex:1; min-width:80px; }
+
+/* Main content area */
+.sg-cabinet__main { background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.08); border-radius:var(--radius-xl); padding:30px 26px; }
+
+/* Tabs */
+.sg-cabinet__tabs { display:flex; gap:6px; margin-bottom:24px; border-bottom:1px solid rgba(201,169,110,0.1); padding-bottom:10px; }
+.sg-cabinet__tab { padding:7px 16px; border-radius:var(--radius-sm); border:none; background:transparent; color:var(--sg-cream-dark); font-family:var(--t-headline-font); font-size:0.82rem; cursor:pointer; transition:all 0.3s; }
+.sg-cabinet__tab:hover { color:var(--sg-cream); }
+.sg-cabinet__tab.active { background:rgba(201,169,110,0.1); color:var(--sg-gold); }
+.sg-cabinet__tab-content { display:none; }
+.sg-cabinet__tab-content.active { display:block; }
+
+/* Cart items */
+.sg-cabinet__cart-item { padding:14px; background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.06); border-radius:var(--radius-md); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.sg-cabinet__cart-name { font-family:var(--t-headline-font); font-size:0.88rem; color:var(--sg-cream); }
+.sg-cabinet__cart-price { font-family:var(--t-headline-font); color:var(--sg-gold); font-size:0.95rem; white-space:nowrap; }
+.sg-cabinet__cart-remove { background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1.2rem; padding:0 4px; transition:transform 0.2s; }
+.sg-cabinet__cart-remove:hover { transform:scale(1.2); }
+.sg-cabinet__cart-empty { padding:32px 20px; text-align:center; color:var(--sg-cream-dark); }
+
+/* Cart summary / checkout CTA */
+.sg-cabinet__cart-summary { padding:18px; background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.15); border-radius:var(--radius-md); margin-top:20px; }
+.sg-cabinet__cart-total { display:flex; justify-content:space-between; align-items:center; font-family:var(--t-headline-font); font-size:1.1rem; color:var(--sg-gold); margin-bottom:14px; }
+.sg-cabinet__cart-checkout { width:100%; padding:12px; background:linear-gradient(135deg, var(--sg-gold), var(--sg-gold-dark)); color:#0b0d17; border:none; border-radius:var(--radius-sm); font-family:var(--t-headline-font); font-size:0.9rem; cursor:pointer; transition:all 0.3s; font-weight:700; }
+.sg-cabinet__cart-checkout:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,169,110,0.3); }
+.sg-cabinet__cart-checkout:disabled { opacity:0.45; cursor:not-allowed; }
+.sg-cabinet__deposit-hint { display:none; background:rgba(240,194,68,0.08); border:1px solid rgba(240,194,68,0.2); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:12px; font-size:0.8rem; color:#f0c244; line-height:1.5; }
+
+/* Pending deposits list */
+.sg-cabinet__pending-list { display:none; background:rgba(240,194,68,0.05); border:1px solid rgba(240,194,68,0.18); border-radius:var(--radius-md); padding:14px; margin-bottom:16px; }
+.sg-cabinet__pending-list.show { display:block; }
+.sg-cabinet__pending-list h4 { font-family:var(--t-headline-font); font-size:0.8rem; color:#f0c244; margin:0 0 10px; letter-spacing:0.05em; text-transform:uppercase; }
+.sg-cabinet__pending-item { display:flex; justify-content:space-between; align-items:center; padding:7px 0; font-size:0.8rem; border-bottom:1px dashed rgba(240,194,68,0.12); flex-wrap:wrap; gap:6px; }
+.sg-cabinet__pending-item:last-child { border-bottom:none; }
+
+/* History */
+.sg-cabinet__history-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(201,169,110,0.06); }
+.sg-cabinet__history-item:last-child { border-bottom:none; }
+.sg-cabinet__history-title { font-family:var(--t-headline-font); font-size:0.88rem; color:var(--sg-cream); }
+.sg-cabinet__history-date { font-size:0.72rem; color:var(--sg-cream-dark); }
+.sg-cabinet__history-amount { font-family:var(--t-headline-font); font-size:0.95rem; }
+.sg-cabinet__history-amount.negative { color:#e74c3c; }
+.sg-cabinet__history-amount.positive { color:#6fcf97; }
+.sg-cabinet__history-amount.pending { color:#f0c244; }
+
+/* Portfolio / My Shares */
+.sg-cabinet__portfolio-empty { padding:32px 20px; text-align:center; color:var(--sg-cream-dark); }
+.sg-cabinet__portfolio-item {
+  display:flex; flex-direction:column; gap:10px;
+  padding:16px; margin-bottom:12px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(201,169,110,0.12);
+  border-radius:var(--radius-md);
+}
+.sg-cabinet__portfolio-item-header {
+  display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;
+}
+.sg-cabinet__portfolio-name { font-family:var(--t-headline-font); font-size:1rem; color:var(--sg-cream); }
+.sg-cabinet__portfolio-meta { font-size:0.8rem; color:var(--sg-cream-dark); margin-top:2px; }
+.sg-cabinet__portfolio-amount { font-family:var(--t-headline-font); font-size:1.05rem; color:var(--sg-gold); white-space:nowrap; }
+.sg-cabinet__portfolio-row {
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  font-size:0.85rem; color:var(--sg-cream-dark);
+}
+.sg-cabinet__portfolio-income { color:#6fcf97; font-family:var(--t-headline-font); font-size:0.95rem; }
+.sg-cabinet__portfolio-rate { display:inline-flex; align-items:center; margin-top:5px; padding:4px 9px; border-radius:999px; background:rgba(201,169,110,.12); border:1px solid rgba(201,169,110,.22); color:#8a7340; font-weight:700; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; }
+.sg-cabinet__portfolio-timer { font-size:0.78rem; color:var(--sg-cream-dark); }
+.sg-cabinet__portfolio-claim {
+  padding:8px 16px; background:linear-gradient(135deg, var(--sg-gold), var(--sg-gold-dark));
+  color:#0b0d17; border:none; border-radius:var(--radius-sm);
+  font-family:var(--t-headline-font); font-size:0.82rem; font-weight:700;
+  cursor:pointer; transition:all 0.3s; white-space:nowrap;
+}
+.sg-cabinet__portfolio-claim:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 18px rgba(201,169,110,0.3); }
+.sg-cabinet__portfolio-claim:disabled { opacity:0.45; cursor:not-allowed; background:rgba(201,169,110,0.25); color:var(--sg-cream-dark); }
+.sg-cabinet__portfolio-summary {
+  margin-top:20px; padding:16px;
+  background:rgba(201,169,110,0.06); border:1px solid rgba(201,169,110,0.15);
+  border-radius:var(--radius-md);
+}
+.sg-cabinet__portfolio-total {
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:var(--t-headline-font); font-size:0.95rem; color:var(--sg-gold);
+  margin-bottom:8px;
+}
+.sg-cabinet__portfolio-note {
+  font-size:0.75rem; color:var(--sg-cream-dark); margin:10px 0 0; line-height:1.45;
+}
+
+/* Wait / unlock progress (7 days + 24h cooldown) — white waiting card */
+.sg-cabinet__wait {
+  margin-top:12px;
+  padding:18px 16px 14px;
+  background:#ffffff;
+  border:1px solid rgba(201,169,110,0.22);
+  border-radius:16px;
+  box-shadow:0 10px 28px rgba(15,18,32,0.08);
+  transition:border-color 0.4s, box-shadow 0.4s;
+  color:#3a3a3a; position:relative; overflow:hidden;
+}
+.sg-cabinet__wait::before { content:""; position:absolute; inset:0; background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.9) 45%,transparent 70%); transform:translateX(-120%); animation:sg-wait-sweep 2.8s ease-in-out infinite; pointer-events:none; }
+.sg-cabinet__wait > * { position:relative; z-index:1; }
+.sg-cabinet__wait-word {
+  text-align:center;
+  font-family:var(--t-headline-font);
+  font-size:1.15rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:#1a1a1a;
+  font-weight:700;
+  margin-bottom:10px;
+  animation:sg-wait-breathe 1.8s ease-in-out infinite;
+}
+.sg-cabinet__wait.is-ready .sg-cabinet__wait-word {
+  letter-spacing:0.18em;
+  color:#1e7a4a;
+  animation:none;
+}
+.sg-cabinet__wait-orbit {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.sg-cabinet__wait-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:#c9a96e;
+  animation:sg-wait-bounce 1.1s ease-in-out infinite;
+}
+.sg-cabinet__wait-dot:nth-child(2) { animation-delay:0.15s; background:#b08d52; }
+.sg-cabinet__wait-dot:nth-child(3) { animation-delay:0.3s; background:#8a7340; }
+.sg-cabinet__wait.is-ready .sg-cabinet__wait-dot { background:#6fcf97; animation:none; }
+.sg-cabinet__wait.is-ready {
+  border-color:rgba(111,207,151,0.35);
+  box-shadow:0 0 20px rgba(111,207,151,0.08);
+}
+.sg-cabinet__wait.is-unlock {
+  border-color:rgba(201,169,110,0.22);
+}
+.sg-cabinet__wait.is-cooldown {
+  border-color:rgba(240,194,68,0.2);
+}
+.sg-cabinet__wait-top {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px; margin-bottom:8px; flex-wrap:wrap;
+}
+.sg-cabinet__wait-phase {
+  font-family:var(--t-headline-font);
+  font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase;
+  color:#6b675c;
+}
+.sg-cabinet__wait.is-ready .sg-cabinet__wait-phase { color:#1e7a4a; }
+.sg-cabinet__wait-countdown {
+  font-family:var(--t-headline-font);
+  font-size:0.95rem; font-weight:600;
+  color:#8a7340;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.02em;
+}
+.sg-cabinet__wait-meta {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px; margin-top:8px; flex-wrap:wrap;
+}
+.sg-cabinet__wait.is-ready .sg-cabinet__wait-countdown {
+  color:#6fcf97;
+  animation:sg-pulse-ready 1.6s ease-in-out infinite;
+}
+.sg-cabinet__wait-track {
+  position:relative;
+  height:10px;
+  background:rgba(255,255,255,0.06);
+  border-radius:999px;
+  overflow:hidden;
+}
+.sg-cabinet__wait-fill {
+  position:absolute; left:0; top:0; bottom:0;
+  width:0%;
+  border-radius:999px;
+  transition:width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  background:linear-gradient(90deg, #8a7340, var(--sg-gold), #f0d78c);
+  background-size:200% 100%;
+  animation:sg-shimmer 2.4s linear infinite;
+}
+.sg-cabinet__wait-fill.is-unlock {
+  background:linear-gradient(90deg, #6b5a2e, var(--sg-gold), #e8c96a);
+  background-size:200% 100%;
+}
+.sg-cabinet__wait-fill.is-cooldown {
+  background:linear-gradient(90deg, #8a6b20, #f0c244, #ffe08a);
+  background-size:200% 100%;
+}
+.sg-cabinet__wait-fill.is-ready {
+  background:linear-gradient(90deg, #3d9b6a, #6fcf97, #a8f0c4);
+  background-size:200% 100%;
+  animation:sg-shimmer 1.6s linear infinite, sg-glow-ready 2s ease-in-out infinite;
+}
+.sg-cabinet__wait-glow {
+  position:absolute; inset:0;
+  pointer-events:none;
+  border-radius:999px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.sg-cabinet__wait-target {
+  margin-top:8px;
+  font-size:0.72rem;
+  color:#6b675c;
+  letter-spacing:0.02em;
+  font-variant-numeric:tabular-nums;
+}
+.sg-cabinet__wait.is-ready .sg-cabinet__wait-target { color:#1e7a4a; }
+.sg-cabinet__wait-bar {
+  position:relative;
+  height:10px;
+  background:rgba(12,14,24,0.08);
+  border-radius:999px;
+  overflow:hidden;
+}
+@keyframes sg-wait-sweep { 0%{transform:translateX(-120%)} 55%,100%{transform:translateX(120%)} }
+@keyframes sg-wait-breathe {
+  0%, 100% { opacity:0.55; letter-spacing:0.26em; }
+  50% { opacity:1; letter-spacing:0.34em; }
+}
+@keyframes sg-wait-bounce {
+  0%, 80%, 100% { transform:translateY(0); opacity:0.45; }
+  40% { transform:translateY(-5px); opacity:1; }
+}
+
+.sg-cabinet__portfolio-claim.is-ready {
+  animation:sg-btn-ready 2s ease-in-out infinite;
+  box-shadow:0 0 16px rgba(111,207,151,0.25);
+}
+
+@keyframes sg-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes sg-pulse-ready {
+  0%, 100% { opacity:1; }
+  50% { opacity:0.7; }
+}
+@keyframes sg-glow-ready {
+  0%, 100% { filter:brightness(1); }
+  50% { filter:brightness(1.15); }
+}
+@keyframes sg-btn-ready {
+  0%, 100% { box-shadow:0 0 12px rgba(111,207,151,0.2); }
+  50% { box-shadow:0 0 22px rgba(111,207,151,0.4); }
+}

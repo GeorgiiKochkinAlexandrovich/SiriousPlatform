@@ -1,0 +1,34 @@
+SIRIUS GLOBAL — IP / CITY / COUNTRY
+
+The site now uses multiple HTTPS IP-geolocation providers with fallback:
+1) ipwho.is
+2) ipapi.co
+3) GeoJS
+4) ipinfo.io
+5) BigDataCloud
+
+No API key is required for the default providers used here. The browser also sends
+its detected public IP/city/country to the backend as a fallback, while the backend
+uses the request IP first when the site is deployed behind a proxy/CDN.
+
+Registration stores:
+- reg_ip
+- reg_city
+- reg_country
+- last_ip
+- last_city
+- last_country
+
+Important: IP geolocation is approximate. City is inferred from the public IP and
+may be wrong or unavailable for VPN/proxy/mobile networks.
+
+Test after starting the backend:
+http://localhost:3000/api/v1/geo
+
+For a real deployment, open this endpoint from the public domain too. If it returns
+an IP, city and country, registration will store the same data.
+
+Run:
+cd backend
+npm install
+node server.js

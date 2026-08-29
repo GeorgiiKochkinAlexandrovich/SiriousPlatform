@@ -1,0 +1,67 @@
+/* ------------------------------------------------------------------
+   08-AUTHENTICATION PAGES (Login / Register)
+------------------------------------------------------------------ */
+.sg-auth { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:100px 24px 60px; background:var(--sg-dark); }
+.sg-auth__card { width:100%; max-width:460px; background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.1); border-radius:var(--radius-xl); padding:44px 36px; }
+.sg-auth__title { font-family:var(--t-headline-font); font-size:1.6rem; color:var(--sg-cream); text-align:center; margin-bottom:6px; }
+.sg-auth__subtitle { text-align:center; color:var(--sg-cream-dark); font-size:0.88rem; margin-bottom:28px; }
+.sg-auth__link { text-align:center; margin-top:20px; font-size:0.85rem; color:var(--sg-cream-dark); }
+.sg-auth__link a { color:var(--sg-gold); text-decoration:none; cursor:pointer; transition:color 0.3s; font-family:var(--t-headline-font); }
+
+/* Form elements */
+.sg-form { font-family: var(--t-text-font); }
+.sg-form .vb-input-group { margin-bottom: 18px; }
+.sg-form .vb-input-group label { display:block; font-family:var(--t-headline-font); font-size:0.78rem; color:var(--sg-cream-dark); margin-bottom:6px; letter-spacing:0.02em; }
+.sg-form .vb-input-group input { width:100%; padding:12px 16px; border-radius:var(--radius-sm); border:1px solid rgba(201,169,110,0.12); background:rgba(255,255,255,0.03); color:var(--sg-cream); font-size:0.88rem; outline:none; transition:border-color 0.3s; font-family:var(--t-text-font); }
+.sg-form .vb-input-group input:focus { border-color:var(--sg-gold); }
+.sg-form .vb-input-group input::placeholder { color:rgba(232,228,217,0.22); }
+.t-input-error { color:#e74c3c; font-size:0.72rem; margin-top:6px; display:none; font-family:var(--t-text-font); }
+.t-input-error.is-visible { display:block; }
+
+/* Phone row: country + number */
+.sg-phone-row {
+  display: flex; gap: 8px; align-items: stretch;
+}
+.sg-phone-country {
+  flex: 0 0 auto; min-width: 140px; max-width: 200px;
+  padding: 10px 8px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,169,110,0.18);
+  color: var(--sg-cream); font-size: 0.8rem;
+  font-family: inherit; cursor: pointer;
+}
+.sg-phone-country option { background: #12141f; color: var(--sg-cream); }
+.sg-phone-input { flex: 1; min-width: 0; }
+
+/* Password strength meter */
+.sg-pass-meter {
+  margin-top: 8px;
+}
+.sg-pass-meter__track {
+  height: 5px; border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.sg-pass-meter__fill {
+  height: 100%; width: 0%;
+  border-radius: 999px;
+  transition: width 0.25s ease, background 0.25s ease;
+  background: #e74c3c;
+}
+.sg-pass-meter__fill.is-weak { width: 33%; background: #e74c3c; }
+.sg-pass-meter__fill.is-medium { width: 66%; background: #f0a030; }
+.sg-pass-meter__fill.is-strong { width: 100%; background: #6fcf97; }
+.sg-pass-meter__label {
+  display: block; margin-top: 5px;
+  font-size: 0.72rem; color: var(--sg-cream-dark);
+}
+.sg-pass-meter__label.is-weak { color: #e74c3c; }
+.sg-pass-meter__label.is-medium { color: #f0a030; }
+.sg-pass-meter__label.is-strong { color: #6fcf97; }
+
+.vb-input-group input.is-valid {
+  border-color: rgba(111,207,151,0.45) !important;
+}
+.vb-input-group input.is-invalid {
+  border-color: rgba(231,76,60,0.55) !important;
+}

@@ -1,0 +1,12 @@
+/* ------------------------------------------------------------------
+   12-CHECKOUT PAGE
+------------------------------------------------------------------ */
+.sg-checkout { min-height:100vh; padding:100px 40px 60px; background:var(--sg-dark); }
+.sg-checkout__inner { max-width:700px; margin:0 auto; }
+.sg-checkout__card { background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.08); border-radius:var(--radius-xl); padding:40px 36px; }
+.sg-checkout__title { font-family:var(--t-headline-font); font-size:1.4rem; color:var(--sg-cream); margin-bottom:24px; text-align:center; }
+.sg-checkout__item { display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(201,169,110,0.06); font-size:0.9rem; }
+.sg-checkout__item span:last-child { font-family:var(--t-headline-font); color:var(--sg-gold); }
+.sg-checkout__total { display:flex; justify-content:space-between; padding:18px 0; font-family:var(--t-headline-font); font-size:1.2rem; color:var(--sg-gold); }
+.sg-checkout__actions { display:flex; gap:12px; margin-top:20px; }
+.sg-checkout__actions .t-btnflex { flex:1; }

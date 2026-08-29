@@ -1,0 +1,25 @@
+/* ------------------------------------------------------------------
+   09-LEGAL & FAQ PAGES
+   Privacy, Terms, Licenses, FAQ accordion.
+------------------------------------------------------------------ */
+.sg-legal { min-height:100vh; padding:120px 40px 80px; background:var(--sg-dark); }
+.sg-legal__inner { max-width:860px; margin:0 auto; }
+.sg-legal__title { font-family:var(--t-headline-font); font-size:clamp(1.6rem,3vw,2.4rem); color:var(--sg-cream); margin-bottom:8px; text-align:center; }
+.sg-legal__subtitle { text-align:center; color:var(--sg-gold); font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; font-family:var(--t-headline-font); margin-bottom:48px; }
+.sg-legal__section { margin-bottom:36px; }
+.sg-legal__section h3 { font-family:var(--t-headline-font); font-size:1.1rem; color:var(--sg-gold); margin-bottom:12px; }
+.sg-legal__section p { color:var(--sg-cream-dark); font-size:0.9rem; line-height:1.7; margin-bottom:10px; }
+.sg-legal__section ul { margin:0; padding-left:20px; }
+.sg-legal__section li { color:var(--sg-cream-dark); font-size:0.88rem; line-height:1.7; margin-bottom:6px; }
+.sg-legal__back { text-align:center; margin-top:48px; }
+.sg-legal__back a { color:var(--sg-gold); cursor:pointer; font-family:var(--t-headline-font); font-size:0.9rem; text-decoration:underline; text-underline-offset:4px; transition:color 0.3s; }
+
+/* FAQ accordion */
+.sg-faq { display:flex; flex-direction:column; gap:14px; max-width:720px; margin:0 auto; }
+.sg-faq__item { background:rgba(255,255,255,0.02); border:1px solid rgba(201,169,110,0.08); border-radius:var(--radius-md); overflow:hidden; transition:border-color 0.3s; }
+.sg-faq__item:hover { border-color:rgba(201,169,110,0.2); }
+.sg-faq__question { padding:18px 22px; font-family:var(--t-headline-font); font-size:0.98rem; color:var(--sg-cream); cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+.sg-faq__question::after { content:'+'; font-size:1.4rem; color:var(--sg-gold); transition:transform 0.3s; }
+.sg-faq__item.open .sg-faq__question::after { transform:rotate(45deg); }
+.sg-faq__answer { max-height:0; overflow:hidden; transition:max-height 0.4s ease, padding 0.4s ease; padding:0 22px; font-size:0.88rem; color:var(--sg-cream-dark); line-height:1.7; }
+.sg-faq__item.open .sg-faq__answer { max-height:300px; padding:0 22px 18px; }

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sirius Admin</title>
+  <style>
+    :root { --bg:#0b0d17; --card:#141824; --gold:#c9a96e; --text:#e8e4d9; --muted:#9a9588; --ok:#6fcf97; --bad:#e74c3c; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); }
+    header { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; border-bottom:1px solid rgba(201,169,110,.15); }
+    h1 { margin:0; font-size:1.25rem; color:var(--gold); }
+    .wrap { max-width:1280px; margin:0 auto; padding:24px; }
+    .card { background:var(--card); border:1px solid rgba(201,169,110,.12); border-radius:12px; padding:20px; margin-bottom:20px; }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .stat { background:rgba(255,255,255,.03); border-radius:10px; padding:14px; }
+    .stat b { display:block; font-size:1.4rem; color:var(--gold); }
+    .stat span { font-size:.8rem; color:var(--muted); }
+    input, button, select { font:inherit; }
+    input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(201,169,110,.25); background:#0b0d17; color:var(--text); margin-bottom:10px; }
+    button { cursor:pointer; border:none; border-radius:8px; padding:10px 16px; background:linear-gradient(135deg,var(--gold),#a8874f); color:#0b0d17; font-weight:700; }
+    button.ghost { background:transparent; border:1px solid rgba(201,169,110,.35); color:var(--gold); }
+    button.bad { background:transparent; border:1px solid rgba(231,76,60,.45); color:var(--bad); }
+    button.ok { background:transparent; border:1px solid rgba(111,207,151,.45); color:var(--ok); }
+    .table-wrap{overflow-x:auto;} table { width:100%; border-collapse:collapse; font-size:.78rem; min-width:980px; }
+    th, td { text-align:left; padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:middle; }
+    th { color:var(--muted); font-weight:600; }
+    .tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .tabs button { opacity:.7; }
+    .tabs button.active { opacity:1; box-shadow:0 0 0 1px var(--gold); }
+    #loginBox { max-width:360px; margin:80px auto; }
+    .err { color:var(--bad); font-size:.85rem; margin-bottom:8px; }
+    .actions { display:flex; gap:6px; justify-content:flex-end; white-space:nowrap; } .actions button{padding:6px 10px;font-size:.75rem;} td.balcell{white-space:nowrap;} td.balcell input{width:88px;display:inline-block;margin:0 6px 0 0;}
+    @media (max-width:800px){ .grid{grid-template-columns:1fr 1fr;} }
+  </style>
+</head>
+<body>
+  <div id="loginBox" class="card">
+    <h1 style="margin-bottom:16px;">Admin Login</h1>
+    <div class="err" id="loginErr"></div>
+    <input id="email" type="email" placeholder="admin@sirius.local" value="admin@sirius.local">
+    <input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn" style="width:100%">Sign in</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <header>
+      <h1>Sirius Global · Admin</h1>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="adminName" style="color:var(--muted);font-size:.85rem;"></span>
+        <a class="ghost" href="/" style="display:inline-flex;align-items:center;padding:8px 14px;border-radius:8px;border:1px solid rgba(201,169,110,.35);color:var(--gold);text-decoration:none;font-weight:700;">Home</a>
+        <button class="ghost" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+    <div class="wrap">
+      <div class="card">
+        <div class="grid" id="summary"></div>
+      </div>
+      <div class="tabs">
+        <button class="active" data-tab="deposits">Pending deposits</button>
+        <button data-tab="withdrawals">Pending withdrawals</button>
+        <button data-tab="users">Users</button>
+        <button data-tab="ledger">Ledger & stats</button>
+        <button data-tab="codes">Registration codes</button>
+        <button data-tab="visits">Site visits</button>
+      </div>
+      <div class="card" id="panel"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    let token = localStorage.getItem('sg_admin_token') || '';
+    let tab = 'deposits';
+    let liveTimer = null;
+    async function liveBalanceTick() {
+      if (!token) return;
+      if (document.activeElement && document.activeElement.hasAttribute('data-bal-id')) return;
+      try {
+        const s = await api('/api/v1/admin/summary');
+        const box = document.getElementById('summary');
+        if (box) box.innerHTML = `
+          <div class="stat"><b>${s.users}</b><span>Users</span></div>
+          <div class="stat"><b>${s.pendingDeposits}</b><span>Pending deposits</span></div>
+          <div class="stat"><b>${s.pendingWithdrawals}</b><span>Pending withdrawals</span></div>
+          <div class="stat"><b>$${Number(s.totalBalance).toFixed(2)}</b><span>Total balances</span></div>`;
+        const { users } = await api('/api/v1/admin/users');
+        users.forEach(u => {
+          const input = document.querySelector('[data-bal-id="'+u.id+'"]');
+          if (input && document.activeElement !== input) input.value = Number(u.balance).toFixed(2);
+        });
+        if (tab === 'ledger') {
+          const y = window.scrollY;
+          await refresh();
+          window.scrollTo(0, y);
+        }
+      } catch (e) {}
+    }
+
+
+    async function api(path, opts = {}) {
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+      if (token) headers.Authorization = 'Bearer ' + token;
+      const res = await fetch(API + path, { ...opts, headers });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || res.statusText);
+      return data;
+    }
+
+    function showApp(user) {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('adminName').textContent = user.email;
+      refresh();
+      if (liveTimer) clearInterval(liveTimer);
+      liveTimer = setInterval(liveBalanceTick, 2500);
+    }
+
+    document.getElementById('loginBtn').onclick = async () => {
+      const err = document.getElementById('loginErr');
+      err.textContent = '';
+      try {
+        const data = await api('/api/v1/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('pass').value
+          })
+        });
+        if (data.user.role !== 'admin') throw new Error('Not an admin account');
+        token = data.token;
+        localStorage.setItem('sg_admin_token', token);
+        showApp(data.user);
+      } catch (e) {
+        err.textContent = e.message;
+      }
+    };
+
+    document.getElementById('logoutBtn').onclick = () => {
+      token = '';
+      localStorage.removeItem('sg_admin_token');
+      location.reload();
+    };
+
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tab = btn.dataset.tab;
+        refresh();
+      };
+    });
+
+    async function refresh() {
+      try {
+        const s = await api('/api/v1/admin/summary');
+        document.getElementById('summary').innerHTML = `
+          <div class="stat"><b>${s.users}</b><span>Users</span></div>
+          <div class="stat"><b>${s.pendingDeposits}</b><span>Pending deposits</span></div>
+          <div class="stat"><b>${s.pendingWithdrawals}</b><span>Pending withdrawals</span></div>
+          <div class="stat"><b>$${Number(s.totalBalance).toFixed(2)}</b><span>Total balances</span></div>`;
+
+        const panel = document.getElementById('panel');
+        if (tab === 'deposits') {
+          const { deposits } = await api('/api/v1/admin/deposits?status=pending');
+          panel.innerHTML = tableDeposits(deposits);
+        } else if (tab === 'withdrawals') {
+          const { withdrawals } = await api('/api/v1/admin/withdrawals?status=pending');
+          panel.innerHTML = tableWithdrawals(withdrawals);
+        } else if (tab === 'codes') {
+          const { codes } = await api('/api/v1/admin/invite-codes');
+          panel.innerHTML = `
+            <div style="margin-bottom:16px;padding:12px;border:1px solid rgba(201,169,110,.2);border-radius:10px;">
+              <div style="font-weight:600;margin-bottom:8px;color:var(--gold);">Generate registration codes</div>
+              <p style="color:var(--muted);font-size:.85rem;margin:0 0 10px;">Each code works once. Required on the public sign-up form.</p>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <input id="codeCount" type="number" min="1" max="50" value="1" style="width:90px;margin:0;">
+                <button id="genCodesBtn">Generate</button>
+              </div>
+            </div>
+            <table><thead><tr>
+              <th>Code</th><th>Status</th><th>Used by</th><th>Created</th><th></th>
+            </tr></thead><tbody>
+            ${(codes||[]).map(c => `<tr>
+              <td style="font-family:ui-monospace,monospace;letter-spacing:.04em;">${esc(c.code)} <button class="ghost" data-act="copy-code" data-code="${esc(c.code)}" style="padding:4px 8px;margin-left:6px;">Copy</button></td>
+              <td>${c.used_at ? '<span style="color:var(--bad);">Used</span>' : '<span style="color:var(--ok);">Free</span>'}</td>
+              <td style="font-size:.8rem;">${c.used_email ? esc(c.used_email) : '—'}</td>
+              <td style="font-size:.75rem;">${esc(c.created_at || '')}</td>
+              <td>${c.used_at ? '' : `<button class="bad" data-act="del-code" data-id="${c.id}">Delete</button>`}</td>
+            </tr>`).join('') || '<tr><td colspan="5" style="color:var(--muted)">No codes yet</td></tr>'}
+            </tbody></table>`;
+          const gen = document.getElementById('genCodesBtn');
+          if (gen) gen.onclick = async () => {
+            try {
+              await api('/api/v1/admin/invite-codes', {
+                method: 'POST',
+                body: JSON.stringify({ count: Number(document.getElementById('codeCount').value) || 1 })
+              });
+              refresh();
+            } catch (e) { alert(e.message); }
+          };
+        } else if (tab === 'ledger') {
+          const data = await api('/api/v1/admin/ledger');
+          const money = n => '$' + Number(n || 0).toFixed(2);
+          const signCol = s => s === 'positive' ? 'var(--ok)' : (s === 'negative' ? 'var(--bad)' : 'var(--gold)');
+          panel.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px;">
+              ${(data.users || []).filter(u=>u.role!=='admin').map(u => `
+                <div style="border:1px solid rgba(201,169,110,.18);border-radius:12px;padding:12px;background:rgba(255,255,255,.02);">
+                  <div style="font-weight:600;color:var(--gold);">${esc(u.name)}</div>
+                  <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;">${esc(u.email)}</div>
+                  <div style="font-size:1.2rem;font-weight:700;">${money(u.balance)}</div>
+                  <div style="font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.55;">
+                    Deposited ${money(u.deposited)} · Pending ${money(u.pendingDep)}<br>
+                    Invested ${money(u.invested)} · Withdraw ${money(u.withdrawn)}<br>
+                    Income claimed ${money(u.claimedIncome)}
+                  </div>
+                </div>`).join('') || '<p style="color:var(--muted)">No users yet</p>'}
+            </div>
+            <h3 style="margin:8px 0;color:var(--gold);font-size:.95rem;">Live activity</h3>
+            <table><thead><tr><th>Time</th><th>User</th><th>Type</th><th>Amount</th><th>Details</th></tr></thead>
+            <tbody>${(data.events||[]).map(e=>`<tr>
+              <td style="font-size:.75rem;white-space:nowrap;">${esc(e.at||'')}</td>
+              <td>${esc(e.name||'—')}<br><small style="color:var(--muted)">${esc(e.email||'')}</small></td>
+              <td>${esc(e.type||'')}</td>
+              <td style="color:${signCol(e.sign)};font-weight:700;">${e.sign==='negative'?'-':'+'}${money(e.amount)}</td>
+              <td style="font-size:.8rem;">${esc(e.label||'')}</td>
+            </tr>`).join('') || '<tr><td colspan="5" style="color:var(--muted)">No activity yet</td></tr>'}</tbody></table>
+            <h3 style="margin:18px 0 8px;color:var(--gold);font-size:.95rem;">Purchases</h3>
+            <table><thead><tr><th>User</th><th>Item</th><th>Amount</th><th>Date</th></tr></thead>
+            <tbody>${(data.purchases||[]).map(r=>`<tr>
+              <td>${esc(r.name||'—')}<br><small style="color:var(--muted)">${esc(r.email||'')}</small></td>
+              <td>${esc(r.property||'')}</td>
+              <td>${money(r.amount)}</td>
+              <td style="font-size:.75rem;">${esc(r.purchased_at||'')}</td>
+            </tr>`).join('') || '<tr><td colspan="4" style="color:var(--muted)">No purchases</td></tr>'}</tbody></table>
+            <h3 style="margin:18px 0 8px;color:var(--gold);font-size:.95rem;">Deposits</h3>
+            <table><thead><tr><th>User</th><th>Amount</th><th>Status</th><th>Paid by user</th><th>Created</th></tr></thead>
+            <tbody>${(data.deposits||[]).map(r=>`<tr>
+              <td>${esc(r.name||'—')}<br><small style="color:var(--muted)">${esc(r.email||'')}</small></td>
+              <td>${money(r.amount)}</td>
+              <td>${esc(r.status||'')}</td>
+              <td>${r.user_confirmed_paid ? 'Yes' : 'No'}</td>
+              <td style="font-size:.75rem;">${esc(r.created_at||'')}</td>
+            </tr>`).join('') || '<tr><td colspan="5" style="color:var(--muted)">No deposits</td></tr>'}</tbody></table>
+            <h3 style="margin:18px 0 8px;color:var(--gold);font-size:.95rem;">Withdrawals</h3>
+            <table><thead><tr><th>User</th><th>Amount</th><th>Fee</th><th>Status</th><th>Address</th><th>Created</th></tr></thead>
+            <tbody>${(data.withdrawals||[]).map(r=>`<tr>
+              <td>${esc(r.name||'—')}<br><small style="color:var(--muted)">${esc(r.email||'')}</small></td>
+              <td>${money(r.amount)}</td>
+              <td>${money(r.fee)}</td>
+              <td>${esc(r.status||'')}</td>
+              <td style="font-size:.75rem;word-break:break-all;">${esc(r.to_address||'')}</td>
+              <td style="font-size:.75rem;">${esc(r.created_at||'')}</td>
+            </tr>`).join('') || '<tr><td colspan="6" style="color:var(--muted)">No withdrawals</td></tr>'}</tbody></table>`;
+        } else if (tab === 'visits') {
+          const { visits } = await api('/api/v1/admin/visits');
+          if (!visits.length) panel.innerHTML = '<p style="color:var(--muted)">No visits yet. Open the site once — IP/city/country will appear here.</p>';
+          else panel.innerHTML = `<table><thead><tr>
+            <th>IP</th><th>City</th><th>Country</th><th>Hits</th><th>First</th><th>Last</th><th>Path</th>
+          </tr></thead><tbody>${visits.map(v => `<tr>
+            <td>${esc(v.ip || '—')}</td>
+            <td>${esc(v.city || '—')}</td>
+            <td>${esc(v.country || '—')}</td>
+            <td>${v.hits || 1}</td>
+            <td style="font-size:.75rem;">${esc(v.first_seen || '')}</td>
+            <td style="font-size:.75rem;">${esc(v.last_seen || '')}</td>
+            <td style="font-size:.75rem;">${esc(v.path || '/')}</td>
+          </tr>`).join('')}</tbody></table>`;
+        } else {
+          const { users } = await api('/api/v1/admin/users');
+          panel.innerHTML = `
+            <div style="margin-bottom:16px;padding:12px;border:1px solid rgba(201,169,110,.2);border-radius:10px;">
+              <div style="font-weight:600;margin-bottom:8px;color:var(--gold);">Generate registration code</div>
+              <p style="color:var(--muted);font-size:.85rem;margin:0 0 10px;">Code format: 3 English letters + 1 digit (example ABC1). Required for registration and login.</p>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <input id="userCodeCount" type="number" min="1" max="50" value="1" style="width:90px;margin:0;">
+                <button id="genUserCodesBtn">Generate code</button>
+              </div>
+              <div id="userLastCodes" style="margin-top:10px;font-family:ui-monospace,monospace;color:var(--ok);"></div>
+            </div>
+            <div style="margin-bottom:16px;padding:12px;border:1px solid rgba(201,169,110,.2);border-radius:10px;">
+              <div style="font-weight:600;margin-bottom:8px;color:var(--gold);">Add user</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input id="newName" placeholder="Name">
+                <input id="newEmail" placeholder="Email">
+                <input id="newPass" placeholder="Password (min 8)" type="password">
+                <input id="newBal" placeholder="Balance" type="number" value="0" step="0.01" min="0">
+                <div style="display:flex;gap:8px;grid-column:1/-1;">
+                  <select id="newPhoneCc" style="width:42%;margin:0;">
+                    <option value="+971">🇦🇪 UAE +971</option>
+                    <option value="+7">🇷🇺 Russia +7</option>
+                    <option value="+380">🇺🇦 Ukraine +380</option>
+                    <option value="+375">🇧🇾 Belarus +375</option>
+                    <option value="+998">🇺🇿 Uzbekistan +998</option>
+                    <option value="+996">🇰🇬 Kyrgyzstan +996</option>
+                    <option value="+992">🇹🇯 Tajikistan +992</option>
+                    <option value="+993">🇹🇲 Turkmenistan +993</option>
+                    <option value="+994">🇦🇿 Azerbaijan +994</option>
+                    <option value="+995">🇬🇪 Georgia +995</option>
+                    <option value="+374">🇦🇲 Armenia +374</option>
+                    <option value="+770">🇰🇿 Kazakhstan +7</option>
+                    <option value="+90">🇹🇷 Turkey +90</option>
+                    <option value="+48">🇵🇱 Poland +48</option>
+                    <option value="+49">🇩🇪 Germany +49</option>
+                    <option value="+33">🇫🇷 France +33</option>
+                    <option value="+44">🇬🇧 UK +44</option>
+                    <option value="+1">🇺🇸 USA +1</option>
+                    <option value="+86">🇨🇳 China +86</option>
+                    <option value="+91">🇮🇳 India +91</option>
+                    <option value="+62">🇮🇩 Indonesia +62</option>
+                    <option value="+84">🇻🇳 Vietnam +84</option>
+                    <option value="+66">🇹🇭 Thailand +66</option>
+                    <option value="+82">🇰🇷 Korea +82</option>
+                    <option value="+81">🇯🇵 Japan +81</option>
+                    <option value="+971">🇦🇪 UAE +971</option>
+                    <option value="+966">🇸🇦 Saudi +966</option>
+                    <option value="+974">🇶🇦 Qatar +974</option>
+                    <option value="+973">🇧🇭 Bahrain +973</option>
+                    <option value="+968">🇴🇲 Oman +968</option>
+                    <option value="+965">🇰🇼 Kuwait +965</option>
+                    <option value="+20">🇪🇬 Egypt +20</option>
+                    <option value="+382">🇲🇪 Montenegro +382</option>
+                    <option value="+381">🇷🇸 Serbia +381</option>
+                  </select>
+                  <input id="newPhone" placeholder="Phone number" style="flex:1;margin:0;">
+                </div>
+                <div style="display:flex;gap:8px;grid-column:1/-1;">
+                  <input id="newInvite" placeholder="Code ABC1 (3 letters + 1 digit)" style="flex:1;margin:0;">
+                  <button type="button" id="fillCodeBtn" class="ghost">Generate into field</button>
+                </div>
+              </div>
+              <button style="margin-top:8px;" id="addUserBtn">Create user</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr>
+              <th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Password</th><th>Balance</th><th>Role</th>
+              <th>Code</th>
+              <th>Reg IP</th><th>Reg city / country</th>
+              <th>Last IP</th><th>Last city / country</th><th></th>
+            </tr></thead>
+            <tbody>${users.map((u,i) => `<tr>
+              <td>${i+1}</td>
+              <td>${esc(u.name)}</td>
+              <td>${esc(u.email)}</td>
+              <td style="font-size:.8rem;white-space:nowrap;">${esc(u.phone || '—')}</td>
+              <td style="font-size:.8rem;font-family:ui-monospace,monospace;">${esc(u.password_plain || '—')}</td>
+              <td class="balcell">
+                <input data-bal-id="${u.id}" type="number" value="${Number(u.balance).toFixed(2)}" step="0.01">
+                <button class="ghost" data-act="set-bal" data-id="${u.id}">Set</button>
+              </td>
+              <td>${u.role}</td>
+              <td style="font-size:.75rem;font-family:ui-monospace,monospace;">${esc(u.invite_code || '—')}</td>
+              <td style="font-size:.75rem;word-break:break-all;">${esc(u.reg_ip || '—')}</td>
+              <td style="font-size:.75rem;">${esc(u.reg_city || '—')}<br><span style="color:var(--muted)">${esc(u.reg_country || '—')}</span></td>
+              <td style="font-size:.75rem;word-break:break-all;">${esc(u.last_ip || '—')}</td>
+              <td style="font-size:.75rem;">${esc(u.last_city || '—')}<br><span style="color:var(--muted)">${esc(u.last_country || '—')}</span></td>
+              <td class="actions">
+                ${u.role === 'admin' ? '' : `<button class="bad" data-act="del-user" data-id="${u.id}">Delete</button>`}
+              </td>
+            </tr>`).join('')}</tbody></table></div>`;
+          const genUser = document.getElementById('genUserCodesBtn');
+          if (genUser) genUser.onclick = async () => {
+            try {
+              const out = await api('/api/v1/admin/invite-codes', {
+                method: 'POST',
+                body: JSON.stringify({ count: Number(document.getElementById('userCodeCount').value) || 1 })
+              });
+              const list = (out.codes || []).map(c => c.code).join('   ');
+              document.getElementById('userLastCodes').textContent = list;
+              if (list) await navigator.clipboard.writeText((out.codes[0] && out.codes[0].code) || list).catch(() => {});
+              alert('New registration code(s):\n' + list);
+            } catch (e) { alert(e.message); }
+          };
+          const fillBtn = document.getElementById('fillCodeBtn');
+          if (fillBtn) fillBtn.onclick = async () => {
+            try {
+              const out = await api('/api/v1/admin/invite-codes', { method: 'POST', body: JSON.stringify({ count: 1 }) });
+              const code = out.codes && out.codes[0] && out.codes[0].code;
+              if (code) document.getElementById('newInvite').value = code;
+            } catch (e) { alert(e.message); }
+          };
+          const addBtn = document.getElementById('addUserBtn');
+          if (addBtn) addBtn.onclick = async () => {
+            try {
+              const cc = document.getElementById('newPhoneCc').value || '';
+              const rawPhone = (document.getElementById('newPhone').value || '').replace(/\s+/g,'');
+              if (!rawPhone) { alert('Phone number is required'); return; }
+              const inviteCode = (document.getElementById('newInvite').value || '').trim();
+              if (!inviteCode) { alert('Access code is required'); return; }
+              await api('/api/v1/admin/users', {
+                method: 'POST',
+                body: JSON.stringify({
+                  name: document.getElementById('newName').value,
+                  email: document.getElementById('newEmail').value,
+                  password: document.getElementById('newPass').value,
+                  balance: Number(document.getElementById('newBal').value) || 0,
+                  phone: cc + rawPhone.replace(/^\+/, ''),
+                  inviteCode
+                })
+              });
+              refresh();
+            } catch (e) { alert(e.message); }
+          };
+        }
+        bindActions();
+      } catch (e) {
+        if (String(e.message).includes('Unauthorized') || String(e.message).includes('Invalid')) {
+          localStorage.removeItem('sg_admin_token');
+          location.reload();
+        } else {
+          document.getElementById('panel').innerHTML = '<p class="err">' + esc(e.message) + '</p>';
+        }
+      }
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function tableDeposits(rows) {
+      if (!rows.length) return '<p style="color:var(--muted)">No pending deposits</p>';
+      return `<table><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Created</th><th>User payment</th><th></th></tr></thead><tbody>
+        ${rows.map(r => `<tr>
+          <td>${r.id}</td>
+          <td>${esc(r.name)}<br><small style="color:var(--muted)">${esc(r.email)}</small></td>
+          <td>$${Number(r.amount).toFixed(2)}</td>
+          <td>${r.created_at}</td>
+          <td>${r.user_confirmed_paid ? '<span style="color:var(--ok);font-weight:700;">I have paid ✓</span><br><small style="color:var(--muted)">'+esc(r.paid_at || '')+'</small>' : '<span style="color:var(--muted)">Not reported</span>'}</td>
+          <td class="actions">
+            <button class="ok" data-act="dep-ok" data-id="${r.id}">Approve</button>
+            <button class="bad" data-act="dep-no" data-id="${r.id}">Reject</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    function tableWithdrawals(rows) {
+      if (!rows.length) return '<p style="color:var(--muted)">No pending withdrawals</p>';
+      return `<table><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Fee</th><th>Address</th><th>Created</th><th></th></tr></thead><tbody>
+        ${rows.map(r => `<tr>
+          <td>${r.id}</td>
+          <td>${esc(r.name)}<br><small style="color:var(--muted)">${esc(r.email)}</small></td>
+          <td>$${Number(r.amount).toFixed(2)}</td>
+          <td>$${Number(r.fee).toFixed(2)}</td>
+          <td style="font-size:.75rem;word-break:break-all;">${esc(r.to_address)}</td>
+          <td>${r.created_at}</td>
+          <td class="actions">
+            <button class="ok" data-act="wd-ok" data-id="${r.id}">Paid</button>
+            <button class="bad" data-act="wd-no" data-id="${r.id}">Reject</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    function bindActions() {
+      document.querySelectorAll('[data-act]').forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.dataset.id;
+          const act = btn.dataset.act;
+          let url = '';
+          if (act === 'dep-ok') url = `/api/v1/admin/deposits/${id}/approve`;
+          if (act === 'dep-no') url = `/api/v1/admin/deposits/${id}/reject`;
+          if (act === 'wd-ok') url = `/api/v1/admin/withdrawals/${id}/approve`;
+          if (act === 'wd-no') url = `/api/v1/admin/withdrawals/${id}/reject`;
+          try {
+            if (act === 'del-user') {
+              if (!confirm('Delete user #' + id + '?')) return;
+              await api('/api/v1/admin/users/' + id, { method: 'DELETE' });
+              refresh();
+              return;
+            }
+            if (act === 'copy-code') {
+              try { await navigator.clipboard.writeText(btn.dataset.code || ''); alert('Copied: ' + btn.dataset.code); } catch (e) { alert(btn.dataset.code); }
+              return;
+            }
+            if (act === 'del-code') {
+              await api('/api/v1/admin/invite-codes/' + id, { method: 'DELETE' });
+              refresh();
+              return;
+            }
+            if (act === 'set-bal') {
+              const input = document.querySelector('[data-bal-id="' + id + '"]');
+              const balance = Number(input && input.value);
+              await api('/api/v1/admin/users/' + id + '/balance', {
+                method: 'POST',
+                body: JSON.stringify({ balance: balance })
+              });
+              refresh();
+              return;
+            }
+            await api(url, { method: 'POST', body: '{}' });
+            refresh();
+          } catch (e) {
+            alert(e.message);
+          }
+        };
+      });
+    }
+
+    // auto session
+    if (token) {
+      api('/api/v1/auth/me').then(d => {
+        if (d.user.role === 'admin') showApp(d.user);
+        else { localStorage.removeItem('sg_admin_token'); }
+      }).catch(() => localStorage.removeItem('sg_admin_token'));
+    }
+  </script>
+</body>
+</html>

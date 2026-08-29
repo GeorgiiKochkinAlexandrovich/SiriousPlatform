@@ -1,0 +1,3 @@
+Put an empty file named RESET_ON_FULL_UPDATE.flag in this backend folder and restart node.
+The database in data/sirius.json will be wiped and this flag will be deleted automatically.
+Do NOT put the flag in data/ — files there are kept across restarts.

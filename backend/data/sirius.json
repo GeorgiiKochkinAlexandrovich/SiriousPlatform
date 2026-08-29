@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@sirius.local",
+      "name": "Administrator",
+      "phone": "+971000000000",
+      "password_hash": "3bb28e911b03f6b1586251685e3f3f9b:61a968a81731023f8e0fb819c1d4166294b658711b3449e9513cdfad143d314fd84722cc8f143d492e8ee8f681370a972115b1b37ad985824679bd9fc5824ba6",
+      "balance": 0,
+      "role": "admin",
+      "share_plan_id": null,
+      "share_plan_price": null,
+      "share_plan_max": null,
+      "license_id": null,
+      "license_expires_at": null,
+      "license_price": null,
+      "created_at": "2026-08-23T20:57:26.337Z",
+      "updated_at": "2026-08-23T20:57:26.338Z",
+      "last_ip": "62.4.34.98",
+      "last_country": "Montenegro",
+      "last_city": "Podgorica",
+      "last_seen_at": "2026-08-29T09:44:47.064Z",
+      "reg_ip": "62.4.34.98",
+      "reg_city": "Podgorica",
+      "reg_country": "Montenegro",
+      "last_login_at": "2026-08-23T21:24:34.167Z"
+    },
+    {
+      "id": 3,
+      "email": "mail@mail.ru",
+      "name": "Serega",
+      "phone": "+75656959479",
+      "password_hash": "fb3580584f08e8fcfaecc8c72b225dc0:3c502b04725a70b7c510fdcda3cde5cfe674137eb2bed2be9601be1f2f3ed7291fb31922fc3204a7ece7d499aeddbb8e3b7d58a661e613ad27f783ee83543c8a",
+      "password_plain": "Dmb2025@",
+      "balance": 0,
+      "role": "user",
+      "share_plan_id": null,
+      "share_plan_price": null,
+      "share_plan_max": null,
+      "license_id": null,
+      "license_expires_at": null,
+      "license_price": null,
+      "reg_ip": "62.4.34.98",
+      "reg_country": "Montenegro",
+      "reg_city": "Podgorica",
+      "last_ip": "62.4.34.98",
+      "last_country": "Montenegro",
+      "last_city": "Podgorica",
+      "last_login_at": "2026-08-29T08:59:09.469Z",
+      "invite_code": "BSU4",
+      "created_at": "2026-08-28T09:52:42.692Z",
+      "updated_at": "2026-08-28T09:52:42.692Z",
+      "last_seen_at": "2026-08-29T09:56:49.128Z"
+    }
+  ],
+  "deposits": [],
+  "withdrawals": [],
+  "transactions": [],
+  "portfolio": [],
+  "visits": [
+    {
+      "id": 1,
+      "session": "s_mt4xn19shjilyq7u",
+      "ip": "62.4.34.98",
+      "country": "Montenegro",
+      "city": "Podgorica",
+      "path": "/",
+      "hits": 5,
+      "first_seen": "2026-08-23T21:21:35.000Z",
+      "last_seen": "2026-08-29T09:45:06.499Z"
+    },
+    {
+      "id": 2,
+      "session": "s_mtcrunjmyxfkzu29",
+      "ip": "62.4.34.98",
+      "country": "Montenegro",
+      "city": "Podgorica",
+      "path": "/",
+      "hits": 1,
+      "first_seen": "2026-08-28T09:51:13.011Z",
+      "last_seen": "2026-08-28T09:51:13.011Z"
+    }
+  ],
+  "invite_codes": [
+    {
+      "id": 1,
+      "code": "CRL4",
+      "created_at": "2026-08-28T09:47:00.455Z",
+      "used_at": "2026-08-28T09:47:26.143Z",
+      "used_by": 2,
+      "used_email": "sergey@mail.ru"
+    },
+    {
+      "id": 2,
+      "code": "BSU4",
+      "created_at": "2026-08-28T09:51:42.103Z",
+      "used_at": "2026-08-28T09:52:42.692Z",
+      "used_by": 3,
+      "used_email": "mail@mail.ru"
+    }
+  ],
+  "seq": {
+    "users": 4,
+    "deposits": 1,
+    "withdrawals": 1,
+    "transactions": 1,
+    "portfolio": 1,
+    "visits": 3,
+    "invite_codes": 3
+  }
+}

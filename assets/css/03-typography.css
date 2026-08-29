@@ -1,0 +1,24 @@
+/* ------------------------------------------------------------------
+   03-TYPOGRAPHY UTILITIES
+   Headings, labels, body text sizes used across the site.
+------------------------------------------------------------------ */
+.sg-title {
+  font-family: var(--t-headline-font);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  color: var(--sg-cream);
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+.sg-label {
+  font-family: var(--t-headline-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--sg-gold);
+  margin-bottom: 14px;
+}
+.sg-desc {
+  color: var(--sg-cream-dark);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}

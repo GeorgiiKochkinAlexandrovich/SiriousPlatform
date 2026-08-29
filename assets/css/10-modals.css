@@ -1,0 +1,48 @@
+/* ------------------------------------------------------------------
+   10-MODAL SYSTEM
+   Overlay, base modal shell, close button, wallet copy box.
+------------------------------------------------------------------ */
+.sg-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1100; display:none; backdrop-filter:blur(5px); }
+.sg-overlay.open { display:block; }
+
+.sg-modal {
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(0.92);
+  background:var(--sg-dark-2); border:1px solid rgba(201,169,110,0.15);
+  border-radius:var(--radius-xl); padding:32px 28px; z-index:1200;
+  max-width:440px; width:94%; opacity:0; pointer-events:none;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  max-height:90vh; overflow-y:auto;
+}
+.sg-modal.open { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+.sg-modal--wide { max-width:600px; } /* Used for property detail */
+
+.sg-modal__close {
+  position:absolute; top:12px; right:12px;
+  width:36px; height:36px; background:rgba(201,169,110,0.1);
+  border:1px solid rgba(201,169,110,0.25); color:var(--sg-gold);
+  font-size:1.4rem; border-radius:var(--radius-sm); cursor:pointer; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.22s; line-height:1; padding:0; font-family:Arial,sans-serif;
+}
+.sg-modal__close:hover { background:var(--sg-gold); color:#0b0d17; transform:rotate(90deg); }
+
+.sg-modal__title { font-family:var(--t-headline-font); font-size:1.15rem; color:var(--sg-cream); margin-bottom:18px; text-align:center; padding-right:28px; }
+.sg-modal__label { font-family:var(--t-headline-font); font-size:0.78rem; color:var(--sg-cream-dark); margin-bottom:6px; display:block; }
+.sg-modal__input {
+  width:100%; padding:12px 16px; border-radius:var(--radius-sm);
+  border:1px solid rgba(201,169,110,0.12); background:rgba(255,255,255,0.03);
+  color:var(--sg-cream); font-size:0.88rem; outline:none; margin-bottom:12px;
+  font-family:var(--t-text-font); transition:border-color 0.3s;
+}
+.sg-modal__input:focus { border-color:var(--sg-gold); }
+.sg-modal__text { font-size:0.85rem; color:var(--sg-cream-dark); line-height:1.55; margin-bottom:14px; }
+.sg-modal__info { background:rgba(240,194,68,0.06); border:1px solid rgba(240,194,68,0.2); border-radius:var(--radius-sm); padding:10px 14px; font-size:0.78rem; color:#f0c244; margin-bottom:14px; line-height:1.5; }
+.sg-modal__pending { display:none; background:rgba(240,194,68,0.08); border:1px solid rgba(240,194,68,0.3); border-radius:var(--radius-sm); padding:14px; color:#f0c244; font-size:0.85rem; line-height:1.5; text-align:center; margin-bottom:14px; }
+.sg-modal__pending.show { display:block; }
+
+/* Wallet copy row inside deposit modal */
+.sg-wallet-box { display:flex; align-items:center; gap:8px; background:rgba(201,169,110,0.08); border:1px solid rgba(201,169,110,0.2); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:12px; }
+.sg-wallet-addr { font-family:'Courier New',monospace; font-size:0.75rem; color:var(--sg-gold); word-break:break-all; flex:1; }
+.sg-copy-btn { background:rgba(201,169,110,0.12); border:1px solid rgba(201,169,110,0.25); color:var(--sg-gold); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-family:var(--t-headline-font); white-space:nowrap; transition:all 0.3s; }
+.sg-copy-btn:hover { background:var(--sg-gold); color:#0b0d17; }
